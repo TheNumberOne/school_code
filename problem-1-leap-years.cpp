@@ -1,34 +1,35 @@
 #include <iostream>
+#include "inputHelper.h"
 
+/**
+ * @author Rosetta Roberts
+ * @param year
+ * @return Whether the passed year is a leap year
+ */
 bool isLeapYear(unsigned int year) {
+    // A leap year is divisible by four,
+    // except for multiples of 100, unless
+    // it is also a multiple of 400.
+
     return year % 4 == 0 && (
             year % 100 != 0 ||
             year % 400 == 0
     );
 }
 
-int main() {
-    std::cout << "Please input a year: ";
+/**
+ * Prompts the user for a year and then displays if it is a
+ * leap year or not.
+ * @return 0 if user input was valid
+ */
+int main(int argc, const char **argv) {
+    int year = getPositiveInteger(argc, argv, "Please input a year: ");
 
-    //I use an int here rather than an unsigned int
-    //because cin will read a negative number into an
-    //unsigned int without error. Therefore if we want to
-    //check if the year is negative, we have to allow it
-    //to be signed when input by the user.
-    int year;
-    std::cin >> year;
-
-    if (!std::cin || year < 0)
-    {
-        std::cout << "Invalid year." << std::endl;
-        return -1;
-    }
+    if (year == -1) return -1;
 
     if (isLeapYear(static_cast<unsigned int>(year))) {
         std::cout << year << " is a leap year." << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << year << " is not a leap year." << std::endl;
     }
 
