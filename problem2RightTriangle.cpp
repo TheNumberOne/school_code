@@ -1,3 +1,9 @@
+/**
+ * @author Rosetta Roberts
+ * @ide Clion with Cygwin
+ * @compile g++ problem2RightTriangle.cpp inputHelper.cpp
+ * @os Windows 10
+ */
 
 #include <stdexcept>
 #include <iostream>

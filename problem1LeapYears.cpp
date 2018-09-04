@@ -1,8 +1,14 @@
+/**
+ * @author Rosetta Roberts
+ * @ide Clion with Cygwin
+ * @compile g++ problem1LeapYears.cpp inputHelper.cpp
+ * @os Windows 10
+ */
+
 #include <iostream>
 #include "inputHelper.h"
 
 /**
- * @author Rosetta Roberts
  * @param year
  * @return Whether the passed year is a leap year
  */

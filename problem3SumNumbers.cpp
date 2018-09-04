@@ -1,10 +1,14 @@
+/**
+ * @author Rosetta Roberts
+ * @ide Clion with Cygwin
+ * @compile g++ problem3SumNumbers.cpp inputHelper.cpp
+ * @os Windows 10
+ */
 
 #include <iostream>
 #include "inputHelper.h"
 
 /**
- * @author Rosetta Roberts
- *
  * Sums the digits in n in the base 10 number system.
  * @param n
  * @return -1 if n &lt; 0. Otherwise the sum of the digits in n.
@@ -25,8 +29,6 @@ int sumDigits(int n) {
 }
 
 /**
- * @author Rosetta Roberts
- *
  * Reads in an integer and then prints out the sum of its digits.
  *
  * @return 0 if the program ran successfully

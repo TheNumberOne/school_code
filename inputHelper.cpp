@@ -1,10 +1,11 @@
-
+/**
+ * @author Rosetta Roberts
+ */
 
 #include <string>
 #include <iostream>
 
 /**
- * @author Rosetta Roberts
  * Tries to parse the given string into an integer.
  * If there is a problem, passes an error to the passed stream.
  * @param string the string to parse.
@@ -34,8 +35,6 @@ static bool tryParseInt(const std::string &string, int &parsed, std::ostream &er
 }
 
 /**
- * @author Rosetta Roberts
- *
  * Reads an integer from either the command line
  * or from stdin. Will first attempt to read the first command
  * line argument. Returns whether it was successful at reading an integer.
