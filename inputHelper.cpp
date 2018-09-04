@@ -1,7 +1,6 @@
 
 
 #include <string>
-#include <stdexcept>
 #include <iostream>
 
 /**
@@ -14,15 +13,15 @@
  * @param errorStream the stream to send error messages to.
  * @return whether parsing was successful.
  */
-static bool tryParsePositiveInteger(const std::string &string, int &parsed, std::ostream &errorStream) {
+static bool tryParseInt(const std::string &string, int &parsed, std::ostream &errorStream, bool nonNegative) {
     try {
         parsed = std::stoi(string);
 
-        if (parsed >= 0) {
+        if (!nonNegative || parsed >= 0) {
             return true;
         }
 
-        errorStream << "Please specify a positive number." << std::endl;
+        errorStream << "Please specify a non negative number." << std::endl;
     }
     catch (std::invalid_argument &e) {
         errorStream << "Please specify a valid number." << std::endl;
@@ -36,41 +35,41 @@ static bool tryParsePositiveInteger(const std::string &string, int &parsed, std:
 
 /**
  * @author Rosetta Roberts
- * Reads a positive integer from either the command line
+ *
+ * Reads an integer from either the command line
  * or from stdin. Will first attempt to read the first command
- * line argument. If an argument is provided and it is not
- * a positive integer or it is not provided and stdin is closed,
- * this will return -1.
+ * line argument. Returns whether it was successful at reading an integer.
+ *
+ * @param result read the integer into this variable
  * @param argc the number of arguments passed to the program.
  * @param argv the arguments passed to the program
  * @param prompt the prompt to use if the number isn't passed in as
  *  an argument to the program.
- * @return a positive integer.
+ * @param nonNegative if the integer read in should be non negative
+ * @return whether this was able to successfully read an integer or not.
  */
-int getPositiveInteger(int argc, const char **argv, const char *prompt) {
+bool readInt(int &result, int argc, const char *const *argv, const char *prompt, bool nonNegative) {
     if (argc > 1) {
-        //Try to parse command line arguments.
-        int num;
-
-        if (tryParsePositiveInteger(argv[1], num, std::cerr)) {
-            return num;
+        if (tryParseInt(argv[1], result, std::cerr, nonNegative)) {
+            return true;
         }
+
+        std::cerr << "Invalid command line argument." << std::endl;
     } else {
-        //Loop until the user passes a positive integer.
+        //Loop until the user passes a nonNegative integer.
         while (std::cin) {
             std::cout << prompt;
 
             std::string input;
             std::getline(std::cin, input);
 
-            int num;
-            if (tryParsePositiveInteger(input, num, std::cout)) {
-                return num;
+            if (tryParseInt(input, result, std::cout, nonNegative)) {
+                return true;
             }
         }
 
-        std::cerr << "Unable to read positive integer from standard input." << std::endl;
+        std::cerr << "Unable to read an integer from standard input." << std::endl;
     }
 
-    return -1;
+    return false;
 }

@@ -23,9 +23,8 @@ bool isLeapYear(unsigned int year) {
  * @return 0 if user input was valid
  */
 int main(int argc, const char **argv) {
-    int year = getPositiveInteger(argc, argv, "Please input a year: ");
-
-    if (year == -1) return -1;
+    int year;
+    if (!readInt(year, argc, argv, "Please input a year: ", true)) return -1;
 
     if (isLeapYear(static_cast<unsigned int>(year))) {
         std::cout << year << " is a leap year." << std::endl;

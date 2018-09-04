@@ -17,21 +17,17 @@
  * @param size the size of the triangle printed
  * @throws std::invalid_argument if size is less than zero.
  */
-void printRightTriangle(int size)
-{
+void printRightTriangle(int size) {
     if (size < 0) throw std::invalid_argument("size");
 
-    for (int numStars = 1; numStars <= size; numStars++)
-    {
+    for (int numStars = 1; numStars <= size; numStars++) {
         int numDashes = size - numStars;
 
-        for (int j = 0; j < numDashes; j++)
-        {
+        for (int j = 0; j < numDashes; j++) {
             std::cout << "-";
         }
 
-        for (int j = 0; j < numStars; j++)
-        {
+        for (int j = 0; j < numStars; j++) {
             std::cout << '*';
         }
 
@@ -44,10 +40,9 @@ void printRightTriangle(int size)
  * then prints it.
  * @returns if the user gave valid input or not
  */
-int main(int argc, const char **argv)
-{
-    int size = getPositiveInteger(argc, argv, "Size of triangle: ");
-    if (size == -1) return -1;
+int main(int argc, char **argv) {
+    int size;
+    if (!readInt(size, argc, argv, "Size of triangle: ", true)) return -1;
 
     printRightTriangle(size);
 
