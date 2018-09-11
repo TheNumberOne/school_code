@@ -4,6 +4,9 @@
 #include <cstddef>
 
 template <typename T>
-void mergeSort(T *array, size_t size);
+void mergeSort(T *array, size_t size)
+{
+    return;
+}
 
 #endif //CS2275_PROJECT_2_TIMSORT_H

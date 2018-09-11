@@ -4,6 +4,9 @@
 #include <cstddef>
 
 template <typename T>
-void selectionSort(T* array, size_t size);
+void selectionSort(T* array, size_t size)
+{
+    return;
+}
 
 #endif //CS2275_PROJECT_2_MERGESORT_H

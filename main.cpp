@@ -20,8 +20,10 @@ int main(int argc, char *argv[]) {
 
     long sortType = strtol(argv[2], nullptr, 10);
 
-    size_t length;
+    size_t length = 0;
     unique_ptr<int[]> array = readFile(argv[1], length);
+
+    clock_t start = clock();
 
     switch (sortType) {
         case 1:
@@ -39,6 +41,16 @@ int main(int argc, char *argv[]) {
             return 1;
     }
 
+    clock_t end = clock();
+
+    double milliseconds = double(end - start) / CLOCKS_PER_SEC / 1000;
+
+    for (size_t i = 0; i < length; i++)
+    {
+        printf("%d\n", array[i]);
+    }
+
+    printf("Took %f ms.\n", milliseconds);
 
     return 0;
 }
