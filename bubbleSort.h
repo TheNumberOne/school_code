@@ -6,7 +6,8 @@
 
 /**
  * Sorts the array using bubble sort. https://en.wikipedia.org/wiki/Bubble_sort
- * @tparam T the type of elements we're sorting. Must support the &lt; operator.
+ * @tparam T the type of elements we're sorting. Must support the &lt; operator
+ * and the swap function.
  * @param array the elements to be sorted.
  * @param size the size of array
  */
