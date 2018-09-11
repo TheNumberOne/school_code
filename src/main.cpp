@@ -1,3 +1,10 @@
+/**
+ * @author Rosetta Roberts
+ * To compile, first run `cmake .` and then
+ * run `make`.
+ */
+
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -28,6 +35,7 @@ int main(int argc, char *argv[]) {
 
     long sortType = strtol(argv[2], nullptr, 10);
 
+    //Time the sort.
     clock_t start = clock();
 
     switch (sortType) {
@@ -45,16 +53,15 @@ int main(int argc, char *argv[]) {
             printUsage(argv[0]);
             return 1;
     }
-
     clock_t end = clock();
 
-    double milliseconds = double(end - start) / CLOCKS_PER_SEC * 1000;
-
-    for (size_t i = 0; i < length; i++)
-    {
+    //Print each element of the array.
+    for (size_t i = 0; i < length; i++) {
         printf("%d\n", array[i]);
     }
 
+    //Print how long the sort took.
+    double milliseconds = double(end - start) / CLOCKS_PER_SEC * 1000;
     printf("Took %f ms.\n", milliseconds);
 
     return 0;

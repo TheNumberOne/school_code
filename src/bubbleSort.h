@@ -1,3 +1,7 @@
+/**
+ * @author Rosetta Roberts
+ */
+
 #ifndef CS2275_PROJECT_2_BUBBLESORT_H
 #define CS2275_PROJECT_2_BUBBLESORT_H
 
@@ -11,22 +15,19 @@
  * @param array the elements to be sorted.
  * @param size the size of array
  */
-template <typename T>
-void bubbleSort(T* array, size_t size)
-{
+template<typename T>
+void bubbleSort(T *array, size_t size) {
     size_t sortedLow = size; //All elements including and after this index are sorted.
 
     //If everything but the first
     //element is sorted, it is necessarily
     //sorted by the fact that there's only once place
     //for it. So we start at index one not zero.
-    while (sortedLow > 1)
-    {
+    while (sortedLow > 1) {
         size_t highestSwitch = 0; //The highest index of an item that's switched this round.
 
         for (size_t i = 1; i < sortedLow; i++) {
-            if (array[i] < array[i - 1])
-            {
+            if (array[i] < array[i - 1]) {
                 std::swap(array[i], array[i - 1]);
                 highestSwitch = i;
             }

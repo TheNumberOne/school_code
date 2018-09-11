@@ -1,3 +1,7 @@
+/**
+ * @author Rosetta Roberts
+ */
+
 #ifndef CS2275_PROJECT_2_TIMSORT_H
 #define CS2275_PROJECT_2_TIMSORT_H
 
@@ -41,6 +45,8 @@ void mergeSort(T *array, size_t size) {
         std::swap(from, to);
     }
 
+    //If the end result is at the wrong place, move it
+    //to the input array.
     if (from != array) {
         std::move(from, from + size, array);
     }
