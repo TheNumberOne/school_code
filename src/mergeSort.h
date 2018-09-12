@@ -30,7 +30,7 @@ void mergeSort(T *array, size_t size) {
         size_t i = 0;
 
         //Merge runs of equal length.
-        for (; i + 2 * mergeLength < size; i += 2 * mergeLength) {
+        for (; i + 2 * mergeLength <= size; i += 2 * mergeLength) {
             merge(from + i, from + i + mergeLength, from + i + 2 * mergeLength, to + i);
         }
 
