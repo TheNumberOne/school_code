@@ -1,65 +1,80 @@
 ﻿#pragma once
 
 #include <iostream>
+#include <utility>
 
-template<typename T>
+template <typename T>
+class linked_list;
+
+template <typename T>
 class node
 {
-	T element_;
-	node<T>* next_;
-	node<T>* previous_;
-
 public:
 	node(): element_(), next_(nullptr), previous_(nullptr) { }
-	explicit node(const T &content): element_(content), next_(nullptr), previous_(nullptr) { }
-	explicit node(T &&content): element_(content), next_(nullptr), previous_(nullptr) { }
+
+	explicit node(const T& content): element_(content), next_(nullptr), previous_(nullptr) { }
+	explicit node(T&& content): element_(std::move(content)), next_(nullptr), previous_(nullptr) { }
 
 	node<T>* get_next_node() { return next_; }
 	const node<T>* get_next_node() const { return next_; }
 
 	node<T>* get_previous_node() { return previous_; }
 	const node<T>* get_previous_node() const { return previous_; }
+
+	T& get() { return element_; }
+	const T& get() const { return element_; }
+
+private:
+	T element_;
+	node<T>* next_;
+	node<T>* previous_;
+
+	friend class linked_list<T>;
 };
 
-template<typename T>
+template <typename T>
 class linked_list
 {
-	node<T>* first_;
-	node<T>* last_;
-
 public:
-	linked_list(): first_(nullptr), last_(nullptr) {}
+	linked_list(): first_(nullptr), last_(nullptr) { }
+
+	//Rule of 5
 	~linked_list();
-	linked_list(const linked_list<T> &other);
-	linked_list(linked_list<T> &&other) noexcept;
-	linked_list<T>& operator=(const linked_list<T> &other);
-	linked_list<T>& operator=(linked_list<T> &&other) noexcept;
-	void swap(linked_list<T> &other) noexcept;
+	linked_list(const linked_list<T>& other);
+	linked_list(linked_list<T>&& other) noexcept;
+	linked_list<T>& operator=(const linked_list<T>& other);
+	linked_list<T>& operator=(linked_list<T>&& other) noexcept;
+
+	void swap(linked_list<T>& other) noexcept;
 
 	void insert_beginning(node<T>* node);
-	node<T>* insert_beginning(const T &item);
-	node<T>* insert_beginning(T &&item);
+	node<T>* insert_beginning(const T& item);
+	node<T>* insert_beginning(T&& item);
 
 	void insert_end(node<T>* node);
-	node<T>* insert_end(const T &item);
-	node<T>* insert_end(T &&item);
+	node<T>* insert_end(const T& item);
+	node<T>* insert_end(T&& item);
 
 	void insert_after(node<T>* n, node<T>* next);
-	node<T>* insert_after(node<T>* n, const T &item);
-	node<T>* insert_after(node<T>* n, T &&item);
+	node<T>* insert_after(node<T>* n, const T& item);
+	node<T>* insert_after(node<T>* n, T&& item);
 
 	void insert_before(node<T>* n, node<T>* before);
-	node<T>* insert_before(node<T>* n, const T &item);
-	node<T>* insert_before(node<T>* n, T &&item);
+	node<T>* insert_before(node<T>* n, const T& item);
+	node<T>* insert_before(node<T>* n, T&& item);
 
 	void remove(node<T>* n);
-	void append(const linked_list<T> &other);
-	void append(linked_list<T> &&other);
+	void append(const linked_list<T>& other);
+	void append(linked_list<T>&& other);
 
 	void swap(node<T>* left, node<T>* right);
 
 	node<T>* get_node(int index);
 	const node<T>* get_node(int index) const;
+
+private:
+	node<T>* first_;
+	node<T>* last_;
 };
 
 /**
@@ -94,10 +109,28 @@ linked_list<T>::linked_list(const linked_list<T>& other)
 		first_ = new node<T>(chain_to_copy->element_);
 		last_ = first_;
 
-		while ((chain_to_copy = chain_to_copy->next_) != nullptr)
+		try
 		{
-			last_->next_ = new node<T>(chain_to_copy->element_);
-			last_ = last_->next_;
+			while ((chain_to_copy = chain_to_copy->next_) != nullptr)
+			{
+				last_->next_ = new node<T>(chain_to_copy->element_);
+				last_ = last_->next_;
+			}
+		}
+		catch (...)
+		{
+			//Cleanup if there is an exception while copying
+			//Since we using new in a loop.
+			while (first_ != nullptr)
+			{
+				auto next = first_->next_;
+				delete first_;
+				first_ = next;
+			}
+			last_ = nullptr;
+
+			//Rethrow exception
+			throw;
 		}
 	}
 	else
@@ -112,7 +145,7 @@ linked_list<T>::linked_list(const linked_list<T>& other)
  * an unspecified valid state.
  */
 template <typename T>
-linked_list<T>::linked_list(linked_list<T>&& other) noexcept : linked_list() 
+linked_list<T>::linked_list(linked_list<T>&& other) noexcept : linked_list()
 {
 	swap(other);
 }
@@ -182,7 +215,7 @@ void linked_list<T>::insert_beginning(node<T>* node)
 template <typename T>
 node<T>* linked_list<T>::insert_beginning(const T& item)
 {
-	node<T>* n = new node<T>(item);
+	auto* n = new node<T>(item);
 	insert_beginning(n);
 	return n;
 }
@@ -194,7 +227,7 @@ node<T>* linked_list<T>::insert_beginning(const T& item)
 template <typename T>
 node<T>* linked_list<T>::insert_beginning(T&& item)
 {
-	node<T>* n = new node<T>(item);
+	auto* n = new node<T>(std::move(item));
 	insert_beginning(n);
 	return n;
 }
@@ -231,7 +264,7 @@ void linked_list<T>::insert_end(node<T>* node)
 template <typename T>
 node<T>* linked_list<T>::insert_end(const T& item)
 {
-	node<T>* n = new node<T>(item);
+	auto* n = new node<T>(item);
 	insert_end(n);
 	return n;
 }
@@ -243,7 +276,7 @@ node<T>* linked_list<T>::insert_end(const T& item)
 template <typename T>
 node<T>* linked_list<T>::insert_end(T&& item)
 {
-	node<T>* n = new node<T>(item);
+	auto* n = new node<T>(std::move(item));
 	insert_end(n);
 	return n;
 }
@@ -258,7 +291,7 @@ void linked_list<T>::insert_after(node<T>* n, node<T>* next)
 {
 	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
 	if (next == nullptr) return;
-	
+
 	if (n->next_ == nullptr)
 	{
 		next->previous_ = n;
@@ -280,7 +313,7 @@ void linked_list<T>::insert_after(node<T>* n, node<T>* next)
 template <typename T>
 node<T>* linked_list<T>::insert_after(node<T>* n, const T& item)
 {
-	node<T>* ret = new node<T>(item);
+	auto* ret = new node<T>(item);
 	insert_after(n, ret);
 	return ret;
 }
@@ -290,8 +323,8 @@ node<T>* linked_list<T>::insert_after(node<T>* n, const T& item)
  */
 template <typename T>
 node<T>* linked_list<T>::insert_after(node<T>* n, T&& item)
-{	
-	node<T>* ret = new node<T>(item);
+{
+	auto* ret = new node<T>(std::move(item));
 	insert_after(n, ret);
 	return ret;
 }
@@ -306,7 +339,7 @@ void linked_list<T>::insert_before(node<T>* n, node<T>* before)
 {
 	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
 	if (before == nullptr) return;
-	
+
 	if (n->previous_ == nullptr)
 	{
 		before->next_ = n;
@@ -328,17 +361,18 @@ void linked_list<T>::insert_before(node<T>* n, node<T>* before)
 template <typename T>
 node<T>* linked_list<T>::insert_before(node<T>* n, const T& item)
 {
-	node<T>* ret = new node<T>(item);
+	auto* ret = new node<T>(item);
 	insert_before(n, ret);
 	return ret;
 }
+
 /**
  * Adds the item before node and returns the node containing it.
  */
 template <typename T>
 node<T>* linked_list<T>::insert_before(node<T>* n, T&& item)
 {
-	node<T>* ret = new node<T>(item);
+	auto* ret = new node<T>(std::move(item));
 	insert_before(n, ret);
 	return ret;
 }
@@ -377,8 +411,8 @@ void linked_list<T>::remove(node<T>* n)
 template <typename T>
 void linked_list<T>::append(const linked_list<T>& other)
 {
-	auto n = other.first_;
-	
+	auto* n = other.first_;
+
 	while (n != nullptr)
 	{
 		insert_end(n->element_);
@@ -413,15 +447,17 @@ void linked_list<T>::swap(node<T>* left, node<T>* right)
 
 /**
  * Retrieves the node at the specified index.
+ * If the index is the length of the list,
+ * returns a nullptr.
  * Behavior is unspecified if the index is negative or past
  * the end of the list. 0-indexed.
  */
 template <typename T>
 node<T>* linked_list<T>::get_node(int index)
 {
-	auto n = first_;
+	auto* n = first_;
 
-	while (index --> 0) n = first_->next_;
+	for (auto i = 0; i < index; i++) n = n->next_;
 
 	return n;
 }
@@ -434,9 +470,33 @@ node<T>* linked_list<T>::get_node(int index)
 template <typename T>
 const node<T>* linked_list<T>::get_node(int index) const
 {
-	auto n = first_;
+	auto* n = first_;
 
-	while (index --> 0) n = first_->next_;
+	for (auto i = 0; i < index; i++) n = n->next_;
 
 	return n;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const linked_list<T>& rhs)
+{
+	auto n = rhs.get_node(0);
+
+	out << '[';
+	if (n != nullptr)
+	{
+		out << n->get();
+		n = n->get_next_node();
+
+		while (n != nullptr)
+		{
+			out << ", ";
+			out << n->get();
+			n = n->get_next_node();
+		}
+	}
+	out << ']';
+
+
+	return out;
 }
