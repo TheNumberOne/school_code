@@ -3,6 +3,7 @@
 
 #include "LinkedList.h"
 #include <string>
+#include <memory>
 
 using namespace std;
 
@@ -100,6 +101,28 @@ int main()
 	cout << strings_copy << endl;
 
 	cout << strings << endl; //[Hello, World]
+
+
+	//Test moving logic works
+	auto five = make_unique<int>(5);
+	auto ten = make_unique<int>(10);
+
+	cout << "Five address: " << five.get() << endl;
+	cout << "Ten address: " << ten.get() << endl;
+
+	linked_list<unique_ptr<int>> not_copyable;
+	not_copyable.insert_beginning(std::move(five));
+	auto moved = std::move(not_copyable);
+
+	linked_list<unique_ptr<int>> not_copyable2;
+	not_copyable2 = std::move(moved);
+
+	not_copyable2.insert_end(std::move(ten));
+
+	cout << not_copyable2.get_node(0)->get().get() << endl; //pointer to five
+	cout << not_copyable2.get_node(1)->get().get() << endl; //pointer to ten
+	cout << *not_copyable2.get_node(0)->get() << endl; //5
+	cout << *not_copyable2.get_node(1)->get() << endl; //10
 
 	return 0;
 }
