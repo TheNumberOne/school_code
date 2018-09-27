@@ -313,6 +313,7 @@ void linked_list<T>::insert_after(node<T>* n, node<T>* next)
 template <typename T>
 node<T>* linked_list<T>::insert_after(node<T>* n, const T& item)
 {
+	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
 	auto* ret = new node<T>(item);
 	insert_after(n, ret);
 	return ret;
@@ -324,6 +325,8 @@ node<T>* linked_list<T>::insert_after(node<T>* n, const T& item)
 template <typename T>
 node<T>* linked_list<T>::insert_after(node<T>* n, T&& item)
 {
+	//We have to check n before allocating a new node so that memory leaks don't happen.
+	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
 	auto* ret = new node<T>(std::move(item));
 	insert_after(n, ret);
 	return ret;
@@ -361,6 +364,7 @@ void linked_list<T>::insert_before(node<T>* n, node<T>* before)
 template <typename T>
 node<T>* linked_list<T>::insert_before(node<T>* n, const T& item)
 {
+	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
 	auto* ret = new node<T>(item);
 	insert_before(n, ret);
 	return ret;
@@ -372,6 +376,7 @@ node<T>* linked_list<T>::insert_before(node<T>* n, const T& item)
 template <typename T>
 node<T>* linked_list<T>::insert_before(node<T>* n, T&& item)
 {
+	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
 	auto* ret = new node<T>(std::move(item));
 	insert_before(n, ret);
 	return ret;
