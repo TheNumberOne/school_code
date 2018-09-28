@@ -1,4 +1,5 @@
 #!/bin/bash
-cmake -DCMAKE_BUILD_TYPE=Release .
-make
-LinkedList/LinkedList
+mkdir -p build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release .. && make && LinkedList/LinkedList
+cd ..

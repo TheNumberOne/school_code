@@ -7,36 +7,36 @@
 
 using namespace std;
 
-class my_exception{};
+/**
+ * Custom exception that won't be able to be caught without a catch all clause
+ */
+class MyException{};
 
 /**
  * This class fails sometimes when it is copied.
  */
-class failing_copy
+class FailingCopy
 {
-private:
-	bool copied_ = false;
-	int index_ = 0;
 public:
-	failing_copy()
+	FailingCopy()
 	{
 		static auto i = 0;
 		index_ = i++;
 	}
 
-	failing_copy(const failing_copy& other): copied_(true), index_(other.index_)
+	FailingCopy(const FailingCopy& other): copied_(true), index_(other.index_)
 	{
 		static auto i = 0;
 
 		//Creates 5 and then fails.
-		if (i++ >= 5) throw my_exception();
+		if (i++ >= 5) throw MyException();
 
-		cout << "Copied " << index_ << endl;
+		cout << "Copied object " << index_ << endl;
 	}
 
-	failing_copy(failing_copy&& other) = default;
+	FailingCopy(FailingCopy&& other) = default;
 
-	~failing_copy()
+	~FailingCopy()
 	{
 		if (copied_)
 		{
@@ -44,85 +44,104 @@ public:
 		}
 	}
 
-	failing_copy& operator=(const failing_copy&) = default;
-	failing_copy& operator=(failing_copy&&) = default;
+	FailingCopy& operator=(const FailingCopy&) = default;
+	FailingCopy& operator=(FailingCopy&&) = default;
+private:
+	bool copied_ = false;
+	int index_ = 0;
 };
-
 
 int main()
 {
-	linked_list<failing_copy> list;
+	cout << "Creating a list full of 100 dummy objects." << endl;
+	LinkedList<FailingCopy> list;
 
 	for (auto i = 0; i < 100; ++i)
 	{
-		list.insert_beginning(failing_copy());
+		list.insertBeginning(FailingCopy());
 	}
 
 	//Test memory leak in copy constructor.
 	//Run with something like valgrind to make sure this works.
 	try
 	{
-		auto copied_list(list);
+		cout << "Testing memory leak in copy constructor. Attempting to copy the list of objects" << endl;
+		LinkedList<FailingCopy> copiedList(list);
 	}
-	catch (my_exception&)
+	catch (MyException&)
 	{
 		cout << "Caught my exception. 5 copied items should be deleted." << endl;	
 	}
 
-	linked_list<std::string> strings; //[]
-	cout << strings << endl;
+	cout << "Creating empty list" << endl;
+	LinkedList<std::string> strings; //[]
+	cout << "List: " << strings << endl;
 
-	auto* n = strings.insert_beginning("Hello"); // [Hello]
-	cout << strings << endl;
-	
-	strings.insert_after(n, "World"); //[Hello, World]
-	cout << strings << endl;
+	cout << "Inserting 'Hello' at beginning of list" << endl;
+	Node<std::string>& helloNode = strings.insertBeginning("Hello"); // [Hello]
+	cout << "List: " << strings << endl;
 
-	auto strings_copy = strings;
-	cout << strings_copy << endl; //[Hello, World]
-	cout << strings << endl;//[Hello, World]
+	cout << "Inserting 'World' after 'Hello'" << endl;
+	strings.insertAfter(helloNode, "World"); //[Hello, World]
+	cout << "List: " << strings << endl;
 
-	n = strings_copy.get_node(0);
-	strings_copy.insert_after(n, "Sunny");//[Hello, Sunny, World]
-	cout << strings_copy << endl;
+	cout << "Copying the list" << endl;
+	LinkedList<std::string> stringsCopy = strings;
+	cout << "Copy: " << stringsCopy << endl; //[Hello, World]
+	cout << "List: " << strings << endl;//[Hello, World]
 
-	strings_copy.append(strings);//[Hello, Sunny, World, Hello, World]
-	cout << strings_copy << endl;
+	cout << "Inserting 'Sunny' after 'Hello' in copy" << endl;
+	Node<std::string>& helloNodeCopy = stringsCopy.getNode(0);
+	stringsCopy.insertAfter(helloNodeCopy, "Sunny");//[Hello, Sunny, World]
+	cout << "Copy: " << stringsCopy << endl;
 
-	strings_copy.insert_end("Ending"); //[Hello, Sunny, World, Hello, World, Ending]
-	cout << strings_copy << endl;
+	cout << "Appending original list to the copy" << endl;
+	stringsCopy.append(strings);//[Hello, Sunny, World, Hello, World]
+	cout << "Copy: " << stringsCopy << endl;
 
-	n = strings_copy.get_node(3); //Second Hello
-	strings_copy.remove(n); //[Hello, Sunny, World, World, Ending]
-	cout << strings_copy << endl;
+	cout << "Inserting 'Ending' at the end of the copy" << endl;
+	stringsCopy.insertEnd("Ending"); //[Hello, Sunny, World, Hello, World, Ending]
+	cout << "Copy: " << stringsCopy << endl;
 
-	n = strings_copy.get_node(0); //Hello
-	strings_copy.insert_before(n, "Beginning"); //[Beginning, Hello, Sunny, World, World, Ending]
-	cout << strings_copy << endl;
+	cout << "Removing the node at index 3 in the copy" << endl;
+	stringsCopy.remove(stringsCopy.getNode(3)); //[Hello, Sunny, World, World, Ending]
+	cout << "Copy: " << stringsCopy << endl;
 
-	cout << strings << endl; //[Hello, World]
+	cout << "Inserting 'Beginning' before the first 'Hello' in this list" << endl;
+	stringsCopy.insertBefore(helloNodeCopy, "Beginning"); //[Beginning, Hello, Sunny, World, World, Ending]
+	cout << "Copy: " << stringsCopy << endl;
+
+	cout << "Original list: " << strings << endl; //[Hello, World]
 
 
 	//Test moving logic works
+	cout << "Creating only movable unique pointers to 5 and 10." << endl;
 	auto five = make_unique<int>(5);
 	auto ten = make_unique<int>(10);
 
 	cout << "Five address: " << five.get() << endl;
 	cout << "Ten address: " << ten.get() << endl;
 
-	linked_list<unique_ptr<int>> not_copyable;
-	not_copyable.insert_beginning(std::move(five));
-	auto moved = std::move(not_copyable);
+	cout << "Creating a list to hold them" << endl;
+	LinkedList<unique_ptr<int>> notCopyable;
 
-	linked_list<unique_ptr<int>> not_copyable2;
-	not_copyable2 = std::move(moved);
+	cout << "Moving pointer to 5 to beginning of list" << endl;
+	notCopyable.insertBeginning(std::move(five));
 
-	not_copyable2.insert_end(std::move(ten));
+	cout << "Moving the list to another location via move constructor" << endl;
+	auto moved = std::move(notCopyable);
 
-	cout << not_copyable2.get_node(0)->get().get() << endl; //pointer to five
-	cout << not_copyable2.get_node(1)->get().get() << endl; //pointer to ten
-	cout << *not_copyable2.get_node(0)->get() << endl; //5
-	cout << *not_copyable2.get_node(1)->get() << endl; //10
+	cout << "Moving the list to another location via move assignment operator" << endl;
+	LinkedList<unique_ptr<int>> moveAssigned;
+	moveAssigned = std::move(moved);
+
+	cout << "Moving 10 to the end of the list" << endl;
+	moveAssigned.insertEnd(std::move(ten));
+
+	cout << "Address of first element: " << moveAssigned.getNode(0).get().get() << endl; //pointer to five
+	cout << "Address of next element: " << moveAssigned.getNode(1).get().get() << endl; //pointer to ten
+	cout << "Value of first element: " << *moveAssigned.getNode(0).get() << endl; //5
+	cout << "Value of next element: " << *moveAssigned.getNode(1).get() << endl; //10
 
 	return 0;
 }

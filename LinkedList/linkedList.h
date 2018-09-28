@@ -4,95 +4,135 @@
 #include <utility>
 
 template <typename T>
-class linked_list;
+class LinkedList;
 
 template <typename T>
-class node
+std::ostream& operator<<(std::ostream&, const LinkedList<T>&);
+
+template <typename T>
+class Node
 {
 public:
-	node(): element_(), next_(nullptr), previous_(nullptr) { }
+	//Do not allow copying or moving a node:
+	Node(const Node<T>& copy) = delete;
+	Node(Node<T>&& copy) = delete;
+	Node<T>& operator=(const Node<T>& rhs) = delete;
+	Node<T>& operator=(Node<T>&& rhs) = delete;
 
-	explicit node(const T& content): element_(content), next_(nullptr), previous_(nullptr) { }
-	explicit node(T&& content): element_(std::move(content)), next_(nullptr), previous_(nullptr) { }
+	Node<T>* getNextNode() { return next_; }
+	const Node<T>* getNextNode() const { return next_; }
 
-	node<T>* get_next_node() { return next_; }
-	const node<T>* get_next_node() const { return next_; }
-
-	node<T>* get_previous_node() { return previous_; }
-	const node<T>* get_previous_node() const { return previous_; }
+	Node<T>* getPreviousNode() { return previous_; }
+	const Node<T>* getPreviousNode() const { return previous_; }
 
 	T& get() { return element_; }
 	const T& get() const { return element_; }
 
+	//Prevent allocating nodes on the stack.
+
+	/**
+	 * Creates a new node and returns a reference to it. Passes ownership.
+	 */
+	static Node<T>& createNode() { return *new Node<T>(); }
+
+	/**
+	 * Creates a new node and returns a reference to it. Passes ownership.
+	 */
+	static Node<T>& createNode(const T& content) { return *new Node<T>(content); }
+
+	/**
+	 * Creates a new node and returns a reference to it. Passes ownership.
+	 */
+	static Node<T>& createNode(T&& content) { return *new Node<T>(std::move(content)); }
+
 private:
 	T element_;
-	node<T>* next_;
-	node<T>* previous_;
+	Node<T>* next_;
+	Node<T>* previous_;
 
-	friend class linked_list<T>;
+	friend class LinkedList<T>;
+
+	//Prevent allocating nodes on the stack.
+	Node(): element_(), next_(nullptr), previous_(nullptr) { }
+	explicit Node(const T& content): element_(content), next_(nullptr), previous_(nullptr) { }
+	explicit Node(T&& content): element_(std::move(content)), next_(nullptr), previous_(nullptr) { }
+	~Node() = default;
 };
 
 template <typename T>
-class linked_list
+class LinkedList
 {
 public:
-	linked_list(): first_(nullptr), last_(nullptr) { }
+	LinkedList(): first_(nullptr), last_(nullptr) { }
 
 	//Rule of 5
-	~linked_list();
-	linked_list(const linked_list<T>& other);
-	linked_list(linked_list<T>&& other) noexcept;
-	linked_list<T>& operator=(const linked_list<T>& other);
-	linked_list<T>& operator=(linked_list<T>&& other) noexcept;
+	~LinkedList();
+	LinkedList(const LinkedList<T>& other);
+	LinkedList(LinkedList<T>&& other) noexcept;
+	LinkedList<T>& operator=(const LinkedList<T>& other);
+	LinkedList<T>& operator=(LinkedList<T>&& other) noexcept;
 
-	void swap(linked_list<T>& other) noexcept;
+	void swap(LinkedList<T>& other) noexcept;
 
-	void insert_beginning(node<T>* node);
-	node<T>* insert_beginning(const T& item);
-	node<T>* insert_beginning(T&& item);
+	void insertBeginning(Node<T>& node);
+	Node<T>& insertBeginning(const T& item);
+	Node<T>& insertBeginning(T&& item);
 
-	void insert_end(node<T>* node);
-	node<T>* insert_end(const T& item);
-	node<T>* insert_end(T&& item);
+	void insertEnd(Node<T>& node);
+	Node<T>& insertEnd(const T& item);
+	Node<T>& insertEnd(T&& item);
 
-	void insert_after(node<T>* n, node<T>* next);
-	node<T>* insert_after(node<T>* n, const T& item);
-	node<T>* insert_after(node<T>* n, T&& item);
+	void insertAfter(Node<T>& n, Node<T>& next);
+	Node<T>& insertAfter(Node<T>& n, const T& item);
+	Node<T>& insertAfter(Node<T>& n, T&& item);
 
-	void insert_before(node<T>* n, node<T>* before);
-	node<T>* insert_before(node<T>* n, const T& item);
-	node<T>* insert_before(node<T>* n, T&& item);
+	void insertBefore(Node<T>& n, Node<T>& before);
+	Node<T>& insertBefore(Node<T>& n, const T& item);
+	Node<T>& insertBefore(Node<T>& n, T&& item);
 
-	void remove(node<T>* n);
-	void append(const linked_list<T>& other);
-	void append(linked_list<T>&& other);
+	void remove(Node<T>& n);
+	void append(const LinkedList<T>& other);
+	void append(LinkedList<T>&& other);
 
-	void swap(node<T>* left, node<T>* right);
+	void swap(Node<T>& left, Node<T>& right) noexcept;
 
-	node<T>* get_node(int index);
-	const node<T>* get_node(int index) const;
+	Node<T>& getNode(int index);
+	const Node<T>& getNode(int index) const;
 
 private:
-	node<T>* first_;
-	node<T>* last_;
+	Node<T>* first_;
+	Node<T>* last_;
+
+	void insertBeginningUnchecked(Node<T>& node) noexcept;
+	void insertEndingUnchecked(Node<T>& node) noexcept;
+	void insertAfterUnchecked(Node<T>& node, Node<T>& after) noexcept;
+	void insertBeforeUnchecked(Node<T>& node, Node<T>& before) noexcept;
+
+	static void attemptVerifyUnused(Node<T>& node);
+	void attemptVerifyPartOfThisList(Node<T>& node);
+
+	friend std::ostream& operator<< <T>(std::ostream&, const LinkedList<T>&);
 };
 
 /**
  * Deletes this list.
  */
 template <typename T>
-linked_list<T>::~linked_list()
+LinkedList<T>::~LinkedList()
 {
-	auto node = first_;
+	Node<T>* chain = first_;
 
-	while (node != nullptr)
+	//Delete every node in the chain.
+	while (chain != nullptr)
 	{
-		auto next = node->get_next_node();
-		delete node;
+		Node<T>* next = chain->getNextNode();
+		chain->next_ = chain->previous_ = nullptr;
+		delete chain;
 
-		node = next;
+		chain = next;
 	}
 
+	//Set pointers to null
 	first_ = nullptr;
 	last_ = nullptr;
 }
@@ -101,42 +141,37 @@ linked_list<T>::~linked_list()
  * Copies other into this list.
  */
 template <typename T>
-linked_list<T>::linked_list(const linked_list<T>& other)
+LinkedList<T>::LinkedList(const LinkedList<T>& other)
 {
-	if (other.first_ != nullptr)
-	{
-		node<T>* chain_to_copy = other.first_;
-		first_ = new node<T>(chain_to_copy->element_);
-		last_ = first_;
-
-		try
-		{
-			while ((chain_to_copy = chain_to_copy->next_) != nullptr)
-			{
-				last_->next_ = new node<T>(chain_to_copy->element_);
-				last_ = last_->next_;
-			}
-		}
-		catch (...)
-		{
-			//Cleanup if there is an exception while copying
-			//Since we using new in a loop.
-			while (first_ != nullptr)
-			{
-				auto next = first_->next_;
-				delete first_;
-				first_ = next;
-			}
-			last_ = nullptr;
-
-			//Rethrow exception
-			throw;
-		}
-	}
-	else
+	//If the other is empty, initialize this emptily.
+	if (other.first_ == nullptr)
 	{
 		first_ = nullptr;
 		last_ = nullptr;
+		return;
+	}
+
+	//Copy the first element of the chain.
+	Node<T>* chain_to_copy = other.first_;
+	first_ = new Node<T>(chain_to_copy->element_);
+	last_ = first_;
+
+	try
+	{
+		while ((chain_to_copy = chain_to_copy->next_) != nullptr)
+		{
+			last_->next_ = new Node<T>(chain_to_copy->element_);
+			last_ = last_->next_;
+		}
+	}
+	catch (...)
+	{
+		//Cleanup if there is an exception while copying
+		//Since we are using new in a loop.
+		this->~LinkedList();
+
+		//Rethrow exception
+		throw;
 	}
 }
 
@@ -145,7 +180,7 @@ linked_list<T>::linked_list(const linked_list<T>& other)
  * an unspecified valid state.
  */
 template <typename T>
-linked_list<T>::linked_list(linked_list<T>&& other) noexcept : linked_list()
+LinkedList<T>::LinkedList(LinkedList<T>&& other) noexcept : LinkedList()
 {
 	swap(other);
 }
@@ -154,10 +189,10 @@ linked_list<T>::linked_list(linked_list<T>&& other) noexcept : linked_list()
  * Copies the contents of the other list into this list.
  */
 template <typename T>
-linked_list<T>& linked_list<T>::operator=(const linked_list<T>& other)
+LinkedList<T>& LinkedList<T>::operator=(const LinkedList<T>& other)
 {
 	//copy-swap idiom
-	linked_list<T> copy = other;
+	LinkedList<T> copy(other);
 	swap(copy);
 	return *this;
 }
@@ -166,7 +201,7 @@ linked_list<T>& linked_list<T>::operator=(const linked_list<T>& other)
  * Moves the content of the other list into this list.
  */
 template <typename T>
-linked_list<T>& linked_list<T>::operator=(linked_list<T>&& other) noexcept
+LinkedList<T>& LinkedList<T>::operator=(LinkedList<T>&& other) noexcept
 {
 	swap(other);
 	return *this;
@@ -176,7 +211,7 @@ linked_list<T>& linked_list<T>::operator=(linked_list<T>&& other) noexcept
  * Swaps the contents of this list with other.
  */
 template <typename T>
-void linked_list<T>::swap(linked_list<T>& other) noexcept
+void LinkedList<T>::swap(LinkedList<T>& other) noexcept
 {
 	using std::swap;
 	swap(first_, other.first_);
@@ -187,48 +222,35 @@ void linked_list<T>::swap(linked_list<T>& other) noexcept
  * Adds the node to the front of this list and assumes ownership of the node.
  * Undefined behavior will result if the node is already part of a list.
  * It is highly recommended that you do not use this function.
- * If the node is null, nothing happens.
  */
 template <typename T>
-void linked_list<T>::insert_beginning(node<T>* node)
+void LinkedList<T>::insertBeginning(Node<T>& node)
 {
-	if (node == nullptr) return;
-
-	if (first_ == nullptr)
-	{
-		last_ = first_ = node;
-		node->next_ = node->previous_ = nullptr;
-	}
-	else
-	{
-		node->next_ = first_;
-		node->previous_ = nullptr;
-		first_->previous_ = node;
-		first_ = node;
-	}
+	attemptVerifyUnused(node);
+	insertBeginningUnchecked(node);
 }
 
 /**
  * Inserts the item at the beginning of this list and
- * returns a pointer to the node containing the item.
+ * returns a reference to the node containing the item.
  */
 template <typename T>
-node<T>* linked_list<T>::insert_beginning(const T& item)
+Node<T>& LinkedList<T>::insertBeginning(const T& item)
 {
-	auto* n = new node<T>(item);
-	insert_beginning(n);
+	Node<T>& n = *new Node<T>(item);
+	insertBeginningUnchecked(n);
 	return n;
 }
 
 /**
  * Inserts the item at the beginning of this list and returns
- * a pointer to the node containing the item.
+ * a reference to the node containing the item.
  */
 template <typename T>
-node<T>* linked_list<T>::insert_beginning(T&& item)
+Node<T>& LinkedList<T>::insertBeginning(T&& item)
 {
-	auto* n = new node<T>(std::move(item));
-	insert_beginning(n);
+	Node<T>& n = *new Node<T>(std::move(item));
+	insertBeginningUnchecked(n);
 	return n;
 }
 
@@ -239,22 +261,10 @@ node<T>* linked_list<T>::insert_beginning(T&& item)
  * If the node is null, nothing happens.
  */
 template <typename T>
-void linked_list<T>::insert_end(node<T>* node)
+void LinkedList<T>::insertEnd(Node<T>& node)
 {
-	if (node == nullptr) return;
-
-	if (last_ == nullptr)
-	{
-		first_ = last_ = node;
-		node->next_ = node->previous_ = nullptr;
-	}
-	else
-	{
-		node->previous_ = last_;
-		node->next_ = nullptr;
-		last_->next_ = node;
-		last_ = node;
-	}
+	attemptVerifyUnused(node);
+	insertEndingUnchecked(node);
 }
 
 /**
@@ -262,10 +272,10 @@ void linked_list<T>::insert_end(node<T>* node)
  * to the last node.
  */
 template <typename T>
-node<T>* linked_list<T>::insert_end(const T& item)
+Node<T>& LinkedList<T>::insertEnd(const T& item)
 {
-	auto* n = new node<T>(item);
-	insert_end(n);
+	Node<T>& n = *new Node<T>(item);
+	insertEndingUnchecked(n);
 	return n;
 }
 
@@ -274,10 +284,10 @@ node<T>* linked_list<T>::insert_end(const T& item)
  * to the last node.
  */
 template <typename T>
-node<T>* linked_list<T>::insert_end(T&& item)
+Node<T>& LinkedList<T>::insertEnd(T&& item)
 {
-	auto* n = new node<T>(std::move(item));
-	insert_end(n);
+	Node<T>& n = *new Node<T>(std::move(item));
+	insertEndingUnchecked(n);
 	return n;
 }
 
@@ -287,35 +297,23 @@ node<T>* linked_list<T>::insert_end(T&& item)
  * Undefined behavior will happen if next has been inserted into another list.
  */
 template <typename T>
-void linked_list<T>::insert_after(node<T>* n, node<T>* next)
+void LinkedList<T>::insertAfter(Node<T>& n, Node<T>& next)
 {
-	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
-	if (next == nullptr) return;
-
-	if (n->next_ == nullptr)
-	{
-		next->previous_ = n;
-		next->next_ = nullptr;
-		last_ = n->next_ = next;
-	}
-	else
-	{
-		next->previous_ = n;
-		next->next_ = n->next_;
-		n->next_->previous_ = next;
-		n->next_ = next;
-	}
+	attemptVerifyUnused(next);
+	attemptVerifyPartOfThisList(n);
+	insertAfterUnchecked(n, next);
 }
 
 /**
  * Adds the item to the end of this list and returns the node containing it.
  */
 template <typename T>
-node<T>* linked_list<T>::insert_after(node<T>* n, const T& item)
+Node<T>& LinkedList<T>::insertAfter(Node<T>& n, const T& item)
 {
-	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
-	auto* ret = new node<T>(item);
-	insert_after(n, ret);
+	attemptVerifyPartOfThisList(n);
+
+	Node<T>& ret = *new Node<T>(item);
+	insertAfterUnchecked(n, ret);
 	return ret;
 }
 
@@ -323,12 +321,12 @@ node<T>* linked_list<T>::insert_after(node<T>* n, const T& item)
  * Adds the item to the end of this list and returns the node containing it.
  */
 template <typename T>
-node<T>* linked_list<T>::insert_after(node<T>* n, T&& item)
+Node<T>& LinkedList<T>::insertAfter(Node<T>& n, T&& item)
 {
-	//We have to check n before allocating a new node so that memory leaks don't happen.
-	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
-	auto* ret = new node<T>(std::move(item));
-	insert_after(n, ret);
+	attemptVerifyPartOfThisList(n);
+
+	Node<T>& ret = *new Node<T>(std::move(item));
+	insertAfterUnchecked(n, ret);
 	return ret;
 }
 
@@ -338,35 +336,23 @@ node<T>* linked_list<T>::insert_after(node<T>* n, T&& item)
  * Undefined behavior will happen if before has been inserted into another list.
  */
 template <typename T>
-void linked_list<T>::insert_before(node<T>* n, node<T>* before)
+void LinkedList<T>::insertBefore(Node<T>& n, Node<T>& before)
 {
-	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
-	if (before == nullptr) return;
-
-	if (n->previous_ == nullptr)
-	{
-		before->next_ = n;
-		before->previous_ = nullptr;
-		first_ = n->previous_ = before;
-	}
-	else
-	{
-		before->next_ = n;
-		before->previous_ = n->previous_;
-		n->previous_->next_ = before;
-		n->previous_ = before;
-	}
+	attemptVerifyUnused(before);
+	attemptVerifyPartOfThisList(n);
+	insertBeforeUnchecked(n, before);
 }
 
 /**
  * Adds the item before node and returns the node containing it.
  */
 template <typename T>
-node<T>* linked_list<T>::insert_before(node<T>* n, const T& item)
+Node<T>& LinkedList<T>::insertBefore(Node<T>& n, const T& item)
 {
-	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
-	auto* ret = new node<T>(item);
-	insert_before(n, ret);
+	attemptVerifyPartOfThisList(n);
+
+	Node<T>& ret = *new Node<T>(item);
+	insertBeforeUnchecked(n, ret);
 	return ret;
 }
 
@@ -374,11 +360,12 @@ node<T>* linked_list<T>::insert_before(node<T>* n, const T& item)
  * Adds the item before node and returns the node containing it.
  */
 template <typename T>
-node<T>* linked_list<T>::insert_before(node<T>* n, T&& item)
+Node<T>& LinkedList<T>::insertBefore(Node<T>& n, T&& item)
 {
-	if (n == nullptr) throw std::invalid_argument("Can't insert a node after a null node.");
-	auto* ret = new node<T>(std::move(item));
-	insert_before(n, ret);
+	attemptVerifyPartOfThisList(n);
+
+	Node<T>& ret = *new Node<T>(std::move(item));
+	insertBeforeUnchecked(n, ret);
 	return ret;
 }
 
@@ -387,40 +374,42 @@ node<T>* linked_list<T>::insert_before(node<T>* n, T&& item)
  * being removed is invalid.
  */
 template <typename T>
-void linked_list<T>::remove(node<T>* n)
+void LinkedList<T>::remove(Node<T>& n)
 {
-	if (n->next_ != nullptr)
+	attemptVerifyPartOfThisList(n);
+
+	if (n.next_ != nullptr)
 	{
-		n->next_->previous_ = n->previous_;
+		n.next_->previous_ = n.previous_;
 	}
 	else
 	{
-		last_ = n->previous_;
+		last_ = n.previous_;
 	}
 
-	if (n->previous_ != nullptr)
+	if (n.previous_ != nullptr)
 	{
-		n->previous_->next_ = n->next_;
+		n.previous_->next_ = n.next_;
 	}
 	else
 	{
-		first_ = n;
+		first_ = &n;
 	}
 
-	delete n;
+	delete &n;
 }
 
 /**
  * Appends the contents of the other list to this one.
  */
 template <typename T>
-void linked_list<T>::append(const linked_list<T>& other)
+void LinkedList<T>::append(const LinkedList<T>& other)
 {
-	auto* n = other.first_;
+	Node<T>* n = other.first_;
 
 	while (n != nullptr)
 	{
-		insert_end(n->element_);
+		insertEnd(n->element_);
 		n = n->next_;
 	}
 }
@@ -429,7 +418,7 @@ void linked_list<T>::append(const linked_list<T>& other)
  * Moves the contents of the other list to the end of this one.
  */
 template <typename T>
-void linked_list<T>::append(linked_list<T>&& other)
+void LinkedList<T>::append(LinkedList<T>&& other)
 {
 	if (other.first_ != nullptr)
 	{
@@ -441,10 +430,11 @@ void linked_list<T>::append(linked_list<T>&& other)
 }
 
 /**
- * Swaps the contents of the two nodes.
+ * Swaps the contents of the two nodes. The two nodes don't have to
+ * be part of this list.
  */
 template <typename T>
-void linked_list<T>::swap(node<T>* left, node<T>* right)
+void LinkedList<T>::swap(Node<T>& left, Node<T>& right) noexcept
 {
 	using std::swap;
 	swap(left->element_, right->element_);
@@ -452,52 +442,183 @@ void linked_list<T>::swap(node<T>* left, node<T>* right)
 
 /**
  * Retrieves the node at the specified index.
- * If the index is the length of the list,
- * returns a nullptr.
- * Behavior is unspecified if the index is negative or past
+ * Will thrown an exception if the index is negative or past
  * the end of the list. 0-indexed.
  */
 template <typename T>
-node<T>* linked_list<T>::get_node(int index)
+Node<T>& LinkedList<T>::getNode(int index)
 {
-	auto* n = first_;
-
-	for (auto i = 0; i < index; i++) n = n->next_;
-
-	return n;
+	//https://stackoverflow.com/a/123995/4230423
+	return const_cast<Node<T>&>(
+		static_cast<const LinkedList<T>&>(*this).getNode(index)
+	);
 }
 
 /**
  * Retrieves the node at the specified index.
- * Behavior is unspecified if the index is negative or past
+ * Will thrown an exception if the index is negative or past
  * the end of the list. 0-indexed.
  */
 template <typename T>
-const node<T>* linked_list<T>::get_node(int index) const
+const Node<T>& LinkedList<T>::getNode(int index) const
 {
-	auto* n = first_;
+	if (index < 0) throw std::invalid_argument("Index cannot be negative.");
 
-	for (auto i = 0; i < index; i++) n = n->next_;
+	Node<T>* n = first_;
 
-	return n;
+	for (auto i = 0; i < index && n != nullptr; i++)
+	{
+		n = n->next_;
+	}
+
+	if (n == nullptr) throw std::invalid_argument("Index cannot be go past the end of this list.");
+
+	return *n;
 }
 
+/**
+ * Inserts the given node at the beginning of this list without
+ * doing argument checking or throwing. Takes ownership of the node.
+ */
 template <typename T>
-std::ostream& operator<<(std::ostream& out, const linked_list<T>& rhs)
+void LinkedList<T>::insertBeginningUnchecked(Node<T>& node) noexcept
 {
-	auto n = rhs.get_node(0);
+	if (first_ == nullptr)
+	{
+		last_ = first_ = &node;
+		node.next_ = node.previous_ = nullptr;
+	}
+	else
+	{
+		node.next_ = first_;
+		node.previous_ = nullptr;
+		first_->previous_ = &node;
+		first_ = &node;
+	}
+}
+
+/**
+ * Inserts the given node at the ending of this list without
+ * doing argument checking or throwing. Takes ownership of the node.
+ */
+template <typename T>
+void LinkedList<T>::insertEndingUnchecked(Node<T>& node) noexcept
+{
+	if (last_ == nullptr)
+	{
+		first_ = last_ = &node;
+		node.next_ = node.previous_ = nullptr;
+	}
+	else
+	{
+		node.previous_ = last_;
+		node.next_ = nullptr;
+		last_->next_ = &node;
+		last_ = &node;
+	}
+}
+
+/**
+ * Inserts after after node without doing argument checking or throwing.
+ * Takes ownership of after.
+ */
+template <typename T>
+void LinkedList<T>::insertAfterUnchecked(Node<T>& node, Node<T>& after) noexcept
+{
+	if (node.next_ == nullptr)
+	{
+		after.previous_ = &node;
+		after.next_ = nullptr;
+		last_ = node.next_ = &after;
+	}
+	else
+	{
+		after.previous_ = &node;
+		after.next_ = node.next_;
+		node.next_->previous_ = &after;
+		node.next_ = &after;
+	}
+}
+
+/**
+ * Inserts before before node without doing argument checking or throwing.
+ * Takes ownership of before.
+ */
+template <typename T>
+void LinkedList<T>::insertBeforeUnchecked(Node<T>& node, Node<T>& before) noexcept
+{
+	if (node.previous_ == nullptr)
+	{
+		before.next_ = &node;
+		before.previous_ = nullptr;
+		first_ = node.previous_ = &before;
+	}
+	else
+	{
+		before.next_ = &node;
+		before.previous_ = node.previous_;
+		node.previous_->next_ = &before;
+		node.previous_ = &before;
+	}
+}
+
+/**
+ * Throws an exception if we can detect that the node has already been inserted into a list.
+ * This detection fails if the node is the only node in a list.
+ */
+template <typename T>
+void LinkedList<T>::attemptVerifyUnused(Node<T>& node)
+{
+	if (node.next_ != nullptr || node.previous_ != nullptr)
+	{
+		throw std::invalid_argument("Node is already part of a list and you are invoking undefined behavior.");
+	}
+}
+
+/**
+ * Throws an exception if the node is not in this list.
+ * It can only detect this if the node is at the end or beginning of a list that
+ * isn't this one or if this list is empty.
+ */
+template <typename T>
+void LinkedList<T>::attemptVerifyPartOfThisList(Node<T>& node)
+{
+	if ((node.next_ == nullptr && &node != last_)
+		|| (node.previous_ == nullptr && &node != first_)
+		|| (first_ == nullptr))
+	{
+		throw std::invalid_argument(
+			"You are attempting to add a node before or after a node that is not"
+			"part of this list. Warning: you are invoking undefined behavior."
+		);
+	}
+}
+
+/**
+ * Outputs the contents of this list to the given stream.
+ */
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const LinkedList<T>& rhs)
+{
+	Node<T>* n = rhs.first_;
 
 	out << '[';
 	if (n != nullptr)
 	{
-		out << n->get();
-		n = n->get_next_node();
-
-		while (n != nullptr)
+		while (true)
 		{
-			out << ", ";
 			out << n->get();
-			n = n->get_next_node();
+			n = n->getNextNode();
+
+			//Outputs a comma between each element.
+			if (n != nullptr)
+			{
+				out << ", ";
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
 	out << ']';
