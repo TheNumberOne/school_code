@@ -1,7 +1,7 @@
 // LinkedList.cpp : Defines the entry point for the application.
 //
 
-#include "LinkedList.h"
+#include "linkedList.h"
 #include <string>
 #include <memory>
 
