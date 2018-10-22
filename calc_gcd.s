@@ -16,8 +16,20 @@ main:
 	sub	r2, fp, 12 @ pointer to location to store second input
 	bl	scanf
 
+	cmp	r0, 2      @ make sure that both integers were read without problem
+	bne	error_reading_input
 
 
+
+
+
+	b	end
+
+error_reading_input:
+	ldr	r0, =error_string
+	bl	printf	
+
+end:
 	add	sp, fp, -4 @ move stack pointer so only the first two variables on the stack are there.
 	pop	{fp, pc}   @ restore the old frame pointer and jump to the return address
 
@@ -27,3 +39,5 @@ prompt_string:
 	.asciz "Please input two integers separated by a comma: "
 scan_string:
 	.asciz " %u , %u"  @ spaces added because scanf matches a space with an arbitrary amount of whitespace (including 0)
+error_string:
+	.asciz "Invalid input\n"
