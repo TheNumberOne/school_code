@@ -1,3 +1,7 @@
+@ Device: Rasberry Pi Model B v1.2
+@ OS: Regular raspberry pi installation (not lite or retro)
+@ gcc --version: gcc (Raspbian 6.3.0-18+rpi1+deb9u1) 6.3.0 20170516
+@ uname -a: Linux raspberrypi 4.14.71-v7+ #1145 SMP Fri Sep 21 15:38:35 BST 2018 armv7l GNU/Linux
 	.global	main
 	.syntax unified
 	.arm
