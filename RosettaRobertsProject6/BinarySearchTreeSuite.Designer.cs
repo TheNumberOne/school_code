@@ -29,7 +29,6 @@
 		private void InitializeComponent()
 		{
             this.label1 = new System.Windows.Forms.Label();
-            this.TxtTree1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.TxtInput = new System.Windows.Forms.TextBox();
             this.TxtResult = new System.Windows.Forms.TextBox();
@@ -43,7 +42,6 @@
             this.button4 = new System.Windows.Forms.Button();
             this.TxtTree2Minimum = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.TxtTree2 = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.BtnTree1Active = new System.Windows.Forms.RadioButton();
             this.BtnTree2Active = new System.Windows.Forms.RadioButton();
@@ -62,6 +60,8 @@
             this.NumTestSuiteSize = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
+            this.TxtTree1 = new System.Windows.Forms.RichTextBox();
+            this.TxtTree2 = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.NumTestSuiteSize)).BeginInit();
             this.SuspendLayout();
             // 
@@ -73,17 +73,6 @@
             this.label1.Size = new System.Drawing.Size(41, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "Tree 1:";
-            // 
-            // TxtTree1
-            // 
-            this.TxtTree1.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtTree1.Location = new System.Drawing.Point(75, 12);
-            this.TxtTree1.Multiline = true;
-            this.TxtTree1.Name = "TxtTree1";
-            this.TxtTree1.ReadOnly = true;
-            this.TxtTree1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TxtTree1.Size = new System.Drawing.Size(713, 80);
-            this.TxtTree1.TabIndex = 3;
             // 
             // button1
             // 
@@ -202,17 +191,6 @@
             this.label6.Size = new System.Drawing.Size(51, 13);
             this.label6.TabIndex = 14;
             this.label6.Text = "Minimum:";
-            // 
-            // TxtTree2
-            // 
-            this.TxtTree2.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TxtTree2.Location = new System.Drawing.Point(75, 138);
-            this.TxtTree2.Multiline = true;
-            this.TxtTree2.Name = "TxtTree2";
-            this.TxtTree2.ReadOnly = true;
-            this.TxtTree2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TxtTree2.Size = new System.Drawing.Size(713, 80);
-            this.TxtTree2.TabIndex = 8;
             // 
             // label7
             // 
@@ -390,11 +368,33 @@
     "he test suite size is too large it will crash the application with an uncatchabl" +
     "e stackoverflow exception)";
             // 
+            // TxtTree1
+            // 
+            this.TxtTree1.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtTree1.Location = new System.Drawing.Point(75, 9);
+            this.TxtTree1.Name = "TxtTree1";
+            this.TxtTree1.ReadOnly = true;
+            this.TxtTree1.Size = new System.Drawing.Size(713, 83);
+            this.TxtTree1.TabIndex = 3;
+            this.TxtTree1.Text = "";
+            // 
+            // TxtTree2
+            // 
+            this.TxtTree2.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TxtTree2.Location = new System.Drawing.Point(75, 138);
+            this.TxtTree2.Name = "TxtTree2";
+            this.TxtTree2.ReadOnly = true;
+            this.TxtTree2.Size = new System.Drawing.Size(713, 83);
+            this.TxtTree2.TabIndex = 8;
+            this.TxtTree2.Text = "";
+            // 
             // BinarySearchTreeSuite
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.TxtTree2);
+            this.Controls.Add(this.TxtTree1);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.NumTestSuiteSize);
@@ -415,7 +415,6 @@
             this.Controls.Add(this.label7);
             this.Controls.Add(this.TxtTree2Minimum);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.TxtTree2);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.TxtTree1Maximum);
@@ -427,7 +426,6 @@
             this.Controls.Add(this.TxtResult);
             this.Controls.Add(this.TxtInput);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.TxtTree1);
             this.Controls.Add(this.label1);
             this.Name = "BinarySearchTreeSuite";
             this.Text = "Binary Search Tree Suite";
@@ -439,7 +437,6 @@
 
 		#endregion
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox TxtTree1;
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.TextBox TxtInput;
 		private System.Windows.Forms.TextBox TxtResult;
@@ -453,7 +450,6 @@
 		private System.Windows.Forms.Button button4;
 		private System.Windows.Forms.TextBox TxtTree2Minimum;
 		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.TextBox TxtTree2;
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.RadioButton BtnTree1Active;
 		private System.Windows.Forms.RadioButton BtnTree2Active;
@@ -472,6 +468,8 @@
 		private System.Windows.Forms.NumericUpDown NumTestSuiteSize;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label13;
-	}
+        private System.Windows.Forms.RichTextBox TxtTree1;
+        private System.Windows.Forms.RichTextBox TxtTree2;
+    }
 }
 

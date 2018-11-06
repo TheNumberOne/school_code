@@ -5,6 +5,8 @@ using System.Linq;
 namespace RosettaRobertsProject6
 {
     /// <summary>
+    ///     Author: Rosetta Roberts
+    ///     <para />
     ///     Represents a node of a binary tree. null is a valid value and represents and empty tree.
     ///     All instance "methods" are defined as extensions functions
     ///     so they can be called on null.
@@ -35,6 +37,11 @@ namespace RosettaRobertsProject6
         public T Value { get; }
     }
 
+    /// <summary>
+    ///     Author: Rosetta Roberts
+    ///     <para />
+    ///     Static class used to hold extension methods on BinarySearchTreeNodes
+    /// </summary>
     public static class BinarySearchTreeNode
     {
         /// <summary>
@@ -93,7 +100,7 @@ namespace RosettaRobertsProject6
 
                 // If the depth doesn't match, we want to put empty spaces in place.
                 // This is so nothing is in the same column.
-                string spaces = string.Concat(Enumerable.Repeat(" ", value.Length + 1));
+                string spaces = " ".Repeat(value.Length + 1);
                 return Row(node.Right, depth - 1, Row(node.Left, depth - 1, accum) + spaces);
             }
 
@@ -279,12 +286,64 @@ namespace RosettaRobertsProject6
         public static BinarySearchTreeNode<T> Intersect<T>(this BinarySearchTreeNode<T> left,
             BinarySearchTreeNode<T> right, IComparer<T> comparer)
         {
-            if (left == null) return right;
-            if (right == null) return left;
+            IEnumerable<T> leftItems = left.Infix();
+            IEnumerable<T> rightItems = right.Infix();
 
-            foreach (T item in right.Prefix()) left = left.Insert(item, comparer);
+            List<T> commonItems = Intersect(leftItems, rightItems, comparer).ToList();
 
-            return left;
+            return BuildBalancedTree(commonItems, 0, commonItems.Count);
+        }
+
+        /// <summary>
+        ///     Enumerates the items in left and right and returns an enumerable of the items shared
+        ///     between the two. It uses the comparer to determine equality. Left and right must both be
+        ///     sorted.
+        /// </summary>
+        private static IEnumerable<T> Intersect<T>(IEnumerable<T> left, IEnumerable<T> right, IComparer<T> comparer)
+        {
+            using (IEnumerator<T> enumeratorLeft = left.GetEnumerator())
+            using (IEnumerator<T> enumeratorRight = right.GetEnumerator())
+            {
+                bool leftRemaining = enumeratorLeft.MoveNext();
+                bool rightRemaining = enumeratorRight.MoveNext();
+
+                while (leftRemaining && rightRemaining)
+                {
+                    T leftItem = enumeratorLeft.Current;
+                    T rightItem = enumeratorRight.Current;
+
+                    int c = comparer.Compare(leftItem, rightItem);
+
+                    // leftItem == rightItem
+                    if (c == 0) yield return leftItem;
+
+                    // leftItem <= rightItem
+                    if (c <= 0) leftRemaining = enumeratorLeft.MoveNext();
+
+                    // leftItem >= rightItem
+                    if (c >= 0) rightRemaining = enumeratorRight.MoveNext();
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Builds a balanced tree using the given items. The items must be sorted.
+        ///     <paramref name="start" /> and <paramref name="end" /> denote a half open range.
+        /// </summary>
+        private static BinarySearchTreeNode<T> BuildBalancedTree<T>(IReadOnlyList<T> sortedItems, int start, int end)
+        {
+            // Return empty tree if there are no items.
+            if (end - start <= 0) return null;
+
+            // Otherwise put middle node as root and build
+            // balanced trees for left and right.
+            int middle = (end + start) / 2;
+
+            return new BinarySearchTreeNode<T>(
+                sortedItems[middle],
+                BuildBalancedTree(sortedItems, start, middle),
+                BuildBalancedTree(sortedItems, middle + 1, end)
+            );
         }
 
         /// <summary>

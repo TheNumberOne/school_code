@@ -76,6 +76,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestSuite.cs" />
+    <Compile Include="Utils.cs" />
     <EmbeddedResource Include="BinarySearchTreeSuite.resx">
       <DependentUpon>BinarySearchTreeSuite.cs</DependentUpon>
     </EmbeddedResource>

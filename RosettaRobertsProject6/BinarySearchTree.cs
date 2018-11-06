@@ -36,7 +36,7 @@ namespace RosettaRobertsProject6
         /// <summary>
         ///     The root node of this tree.
         /// </summary>
-        private BinarySearchTreeNode<T> Root { get; set; }
+        public BinarySearchTreeNode<T> Root { get; private set; }
 
         /// <inheritdoc />
         /// <summary>

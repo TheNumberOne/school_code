@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace RosettaRobertsProject6
 {
     /// <summary>
+    ///     Author: Rosetta Roberts
+    ///     <para />
     ///     A test suite for testing pre sorted and non pre sorted items into a binary tree.
     /// </summary>
     public static class TestSuite

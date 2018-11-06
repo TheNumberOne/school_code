@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace RosettaRobertsProject6
 {
     /// <summary>
+    ///     Author: Rosetta Roberts
+    ///     <para />
     ///     The form used for testing of the binary search tree class.
     /// </summary>
     public partial class BinarySearchTreeSuite : Form
     {
+        private BinarySearchTreeNode<string> _lastFound;
+
         /// <summary>
         ///     The first tree
         /// </summary>
@@ -36,7 +41,7 @@ namespace RosettaRobertsProject6
             set
             {
                 _tree1 = value;
-                TxtTree1.Text = value.ToString(HighlightLastFound);
+                DisplayTree(TxtTree1, value);
                 TxtTree1Minimum.Text = value.Empty() ? "" : value.MinValue();
                 TxtTree1Maximum.Text = value.Empty() ? "" : value.MaxValue();
                 TxtTree1MinDepth.Text = value.MinDepth().ToString();
@@ -54,7 +59,7 @@ namespace RosettaRobertsProject6
             set
             {
                 _tree2 = value;
-                TxtTree2.Text = value.ToString(HighlightLastFound);
+                DisplayTree(TxtTree2, value);
                 TxtTree2Minimum.Text = value.Empty() ? "" : value.MinValue();
                 TxtTree2Maximum.Text = value.Empty() ? "" : value.MaxValue();
                 TxtTree2MinDepth.Text = value.MinDepth().ToString();
@@ -95,7 +100,17 @@ namespace RosettaRobertsProject6
         /// <summary>
         ///     Used to store the last node found.
         /// </summary>
-        private BinarySearchTreeNode<string> LastFound { get; set; }
+        private BinarySearchTreeNode<string> LastFound
+        {
+            get => _lastFound;
+            set
+            {
+                _lastFound = value;
+                // Update tree's display.
+                Tree1 = Tree1;
+                Tree2 = Tree2;
+            }
+        }
 
         /// <summary>
         ///     Which tree is active?
@@ -111,10 +126,64 @@ namespace RosettaRobertsProject6
         }
 
         /// <summary>
-        ///     This function capitalizes the value of the node if it was the last node found.
+        ///     Displays the binary search tree in the given textbox. Bolds the last node
+        ///     found.
         /// </summary>
-        private string HighlightLastFound(BinarySearchTreeNode<string> node) =>
-            node == LastFound ? node.Value.ToUpper() : node.Value;
+        private void DisplayTree(RichTextBox textBox, BinarySearchTree<string> tree)
+        {
+            textBox.Clear();
+            int maxDepth = tree.MaxDepth();
+
+            for (int i = 0; i < maxDepth; i++)
+            {
+                if (i != 0) textBox.AppendText("\n");
+                AppendLevel(textBox, tree.Root, i);
+            }
+        }
+
+        /// <summary>
+        ///     Appends the level of <paramref name="node" /> at the specified <paramref name="depth" />.
+        ///     Bolds the last node found.
+        /// </summary>
+        private void AppendLevel(RichTextBox textBox, BinarySearchTreeNode<string> node, int depth)
+        {
+            // Tail call optimized.
+            while (true)
+            {
+                if (node == null) return;
+
+                // First we've gotta add the nodes on the left.
+                AppendLevel(textBox, node.Left, depth - 1);
+
+                // Added space for padding.
+                string s = node.Value + " ";
+
+                int previousLength = textBox.TextLength;
+                textBox.AppendText(depth == 0 ? s : " ".Repeat(s.Length));
+
+                // Select text. Subtracted one to not include trailing space.
+                textBox.Select(previousLength, s.Length - 1);
+
+                // Set font style.
+                textBox.SelectionFont = NodeFont(node, textBox.Font);
+
+                // Add the nodes on the right now.
+                node = node.Right;
+                depth--;
+            }
+        }
+
+        /// <summary>
+        ///     Calculates the font for the given node.
+        ///     Basically bold if last found and normal otherwise.
+        /// </summary>
+        private Font NodeFont(BinarySearchTreeNode<string> node, Font defaultFont)
+        {
+            if (node != LastFound) return defaultFont;
+
+            //return new Font(defaultFont, node == LastFound ? FontStyle.Bold : FontStyle.Regular);
+            return new Font(defaultFont.FontFamily, defaultFont.Size * 1.3f, FontStyle.Bold);
+        }
 
         /// <summary>
         ///     Updates how the active tree is displayed.
@@ -170,7 +239,6 @@ namespace RosettaRobertsProject6
         {
             LastFound = ActiveTree.Predecessor(TxtInput.Text);
             Result = LastFound.ToDisplayString();
-            UpdateActive();
         }
 
         /// <summary>
@@ -180,7 +248,6 @@ namespace RosettaRobertsProject6
         {
             LastFound = ActiveTree.Find(TxtInput.Text);
             Result = LastFound.ToDisplayString();
-            UpdateActive();
         }
 
         /// <summary>
