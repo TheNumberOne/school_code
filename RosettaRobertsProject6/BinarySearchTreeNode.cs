@@ -57,13 +57,8 @@ namespace RosettaRobertsProject6
         /// <summary>
         ///     Returns a list of all the items in infix order.
         /// </summary>
-        public static string GetStringOfAllValuesInInfixOrder<T>(this BinarySearchTreeNode<T> root)
-        {
-            if (root == null) return "()";
-            if (root.Left == null && root.Right == null) return root.Value.ToString();
-            return
-                $"({root.Left.GetStringOfAllValuesInInfixOrder()} {root.Value} {root.Right.GetStringOfAllValuesInInfixOrder()})";
-        }
+        public static string GetStringOfAllValuesInInfixOrder<T>(this BinarySearchTreeNode<T> root) =>
+            "[" + string.Join(", ", root.Infix()) + "]";
 
         /// <summary>
         ///     Alias for <see cref="GetStringOfAllValuesInInfixOrder{T}" />.
@@ -79,20 +74,26 @@ namespace RosettaRobertsProject6
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="root"></param>
+        /// <param name="formatter">The function used to format the items in this tree. By default just calls ToString()</param>
         /// <returns></returns>
-        public static string ToDisplayString<T>(this BinarySearchTreeNode<T> root)
+        public static string ToDisplayString<T>(this BinarySearchTreeNode<T> root,
+            Func<BinarySearchTreeNode<T>, string> formatter = null)
         {
+            formatter = formatter ?? (item => item.Value?.ToString() ?? "null");
+
             // Returns the string representation for a row of this tree at a
             // specified depth.
             string Row(BinarySearchTreeNode<T> node, int depth, string accum)
             {
                 if (node == null) return accum;
 
-                if (depth == 0) return Row(node.Right, depth - 1, Row(node.Left, depth - 1, accum) + node.Value + " ");
+                string value = formatter(node);
+
+                if (depth == 0) return Row(node.Right, depth - 1, Row(node.Left, depth - 1, accum) + value + " ");
 
                 // If the depth doesn't match, we want to put empty spaces in place.
                 // This is so nothing is in the same column.
-                string spaces = string.Concat(Enumerable.Repeat(" ", node.Value.ToString().Length + 1));
+                string spaces = string.Concat(Enumerable.Repeat(" ", value.Length + 1));
                 return Row(node.Right, depth - 1, Row(node.Left, depth - 1, accum) + spaces);
             }
 
@@ -145,16 +146,16 @@ namespace RosettaRobertsProject6
 
             int c = comparer.Compare(root.Value, item);
 
+            // Don't do anything if there's a duplicate.
             if (c == 0) return root;
 
+            // root.Value < item
             if (c < 0)
-            {
                 return new BinarySearchTreeNode<T>(
                     root.Value,
                     root.Left,
                     root.Right.Insert(item, comparer)
                 );
-            }
 
             return new BinarySearchTreeNode<T>(
                 root.Value,
@@ -205,8 +206,10 @@ namespace RosettaRobertsProject6
 
             int c = comparer.Compare(root.Value, item);
 
+            // root.Value < item
             if (c < 0) return new BinarySearchTreeNode<T>(root.Value, root.Left, root.Right.Delete(item, comparer));
 
+            // root.Value > item
             if (c > 0) return new BinarySearchTreeNode<T>(root.Value, root.Left.Delete(item, comparer), root.Right);
 
             // c == 0
@@ -256,7 +259,9 @@ namespace RosettaRobertsProject6
                     root = root.Right;
                 }
                 else
+                {
                     root = root.Left;
+                }
             }
 
             return parentPredecessor;

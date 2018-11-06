@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace RosettaRobertsProject6
@@ -12,12 +13,19 @@ namespace RosettaRobertsProject6
     {
         /// <summary>
         ///     Creates a binary search tree with the given comparator.
-        ///     If null or absent, uses the default comparator for that type.
         /// </summary>
         /// <param name="comparer"></param>
-        public BinarySearchTree(IComparer<T> comparer = null)
+        public BinarySearchTree(IComparer<T> comparer)
         {
-            Comparer = comparer ?? Comparer<T>.Default;
+            Comparer = comparer;
+        }
+
+        /// <summary>
+        ///     Creates a binary search tree using the default comparator.
+        /// </summary>
+        public BinarySearchTree()
+        {
+            Comparer = Comparer<T>.Default;
         }
 
         /// <summary>
@@ -52,6 +60,11 @@ namespace RosettaRobertsProject6
         /// </summary>
         /// <returns></returns>
         public override string ToString() => Root.ToDisplayString();
+
+        /// <summary>
+        ///     Formats the string using the specified formatter.
+        /// </summary>
+        public string ToString(Func<BinarySearchTreeNode<T>, string> formatter) => Root.ToDisplayString(formatter);
 
         /// <summary>
         ///     Returns a string representation sh

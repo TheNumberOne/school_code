@@ -36,7 +36,7 @@ namespace RosettaRobertsProject6
             set
             {
                 _tree1 = value;
-                TxtTree1.Text = value.ToString();
+                TxtTree1.Text = value.ToString(HighlightLastFound);
                 TxtTree1Minimum.Text = value.Empty() ? "" : value.MinValue();
                 TxtTree1Maximum.Text = value.Empty() ? "" : value.MaxValue();
                 TxtTree1MinDepth.Text = value.MinDepth().ToString();
@@ -54,7 +54,7 @@ namespace RosettaRobertsProject6
             set
             {
                 _tree2 = value;
-                TxtTree2.Text = value.ToString();
+                TxtTree2.Text = value.ToString(HighlightLastFound);
                 TxtTree2Minimum.Text = value.Empty() ? "" : value.MinValue();
                 TxtTree2Maximum.Text = value.Empty() ? "" : value.MaxValue();
                 TxtTree2MinDepth.Text = value.MinDepth().ToString();
@@ -93,6 +93,11 @@ namespace RosettaRobertsProject6
         }
 
         /// <summary>
+        ///     Used to store the last node found.
+        /// </summary>
+        private BinarySearchTreeNode<string> LastFound { get; set; }
+
+        /// <summary>
         ///     Which tree is active?
         /// </summary>
         private Active WhichActive { get; set; } = Active.Tree1;
@@ -104,6 +109,12 @@ namespace RosettaRobertsProject6
         {
             set => TxtResult.Text = value;
         }
+
+        /// <summary>
+        ///     This function capitalizes the value of the node if it was the last node found.
+        /// </summary>
+        private string HighlightLastFound(BinarySearchTreeNode<string> node) =>
+            node == LastFound ? node.Value.ToUpper() : node.Value;
 
         /// <summary>
         ///     Updates how the active tree is displayed.
@@ -157,7 +168,9 @@ namespace RosettaRobertsProject6
         /// </summary>
         private void Predecessor(object sender, EventArgs e)
         {
-            Result = ActiveTree.Predecessor(TxtInput.Text).ToString();
+            LastFound = ActiveTree.Predecessor(TxtInput.Text);
+            Result = LastFound.ToDisplayString();
+            UpdateActive();
         }
 
         /// <summary>
@@ -165,7 +178,9 @@ namespace RosettaRobertsProject6
         /// </summary>
         private void Find(object sender, EventArgs e)
         {
-            Result = ActiveTree.Find(TxtInput.Text).ToString();
+            LastFound = ActiveTree.Find(TxtInput.Text);
+            Result = LastFound.ToDisplayString();
+            UpdateActive();
         }
 
         /// <summary>
