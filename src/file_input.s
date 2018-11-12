@@ -1,10 +1,10 @@
 	.eqv	.fp_reg_offset, .regs_saved*4 - 4
 
 	.text
-	.align	2
 	.global	main
 	.syntax unified
 	.arm
+	.align	3
 main:
 	push	{fp, lr}
 	.set	.regs_saved, 2
@@ -53,14 +53,17 @@ read_file:
 	mov 	buffer_current, buffer_start
 
 .read_into_buffer:
-	mov 	a1, file
-	mov 	a2, buffer_current
-	mov 	a3, buffer_left
-	bl	read
+	mov 	a1, buffer_current
+	mov	a2, 1
+	mov	a3, buffer_left
+	mov	a4, file
+	bl	fread
 	cmp	r0, 0
 	beq	.end_of_file
+	cmp	r0, -1
+	beq	.error_reading_file
 	sub	buffer_left, r0
-	sub	buffer_current, r0
+	add	buffer_current, r0
 	cmp	buffer_left, 0
 	bne	.read_into_buffer
 
@@ -79,6 +82,14 @@ read_file:
 .realloc_failed:
 	mov	r0, buffer_start
 	bl	free
+	b	.close_file
+
+.error_reading_file:
+	bl	__errno_location
+	ldr	a2, [r0]
+	ldr	a1, =.error_reading_file_str
+	bl	printf
+	mov	r0, 0
 	b	.close_file
 
 .end_of_file:
@@ -101,4 +112,4 @@ read_file:
 
 
 .read_file_flags: .asciz "r"
-
+.error_reading_file_str: .asciz "Error reading file: %d\n"
