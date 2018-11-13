@@ -44,7 +44,7 @@ main:
 	
 	mov	v1, r0
 	add	v2, r0, r1, lsl 2 @ v2 = r0 + (r1 << 2)
-
+	bl	merge_sort
 .numbers_loop:
 	cmp	v1, v2
 	beq	.end_numbers_loop
