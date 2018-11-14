@@ -5,64 +5,103 @@
 	.global	main
 	.arm
 	.align	2
+@ first argument is number of params
+@ second argument is pointer to param pointers.
 main:
-	push	{v1, v2, fp, lr}
-	.set	.regs_saved, 4
+	push	{v1, v2, v3, v4, v5, fp, lr}
+	.set	.regs_saved, 7
 	add	fp, sp, .fp_reg_offset
-	@sub	sp, 4	
+	sub	sp, 4	
 
-	ldr	a1, =.file_name
+	@ first check num arguments
+	cmp	a1, 3
+	bne	.usage
+
+	@ save save file to v1
+	ldr	v1, [a2, 8]
+
+	@ read file.
+	ldr	a1, [a2, 4]
 	bl	read_file
-	bl	puts
+	cmp	r0, 0
+	beq	.error
 	
+	mov	v2, r0  @ remember string so we can free it
 
-	ldr	a1, =.string_to_explode 
-	mov	a2, ' @ space character 
+	mov	a2, '\n
 	bl	explode
 
-	mov	v1, r0
+	mov	v4, r0
+	mov	r0, v2
+	bl	free
 
-.loop:
-	ldr	a1, =.explode_output
-	ldr	a2, [v1], 4
-	cmp	a2, 0
-	beq	.end_loop
-	bl	printf
-	b	.loop
-.end_loop:
+	cmp	v4, 0
+	beq	.error
 
-	ldr	r0, =.number_str
-	bl	string_to_int
-	mov	r1, r0
-	ldr	r0, =.number_output
-	bl	printf
-
-	ldr	a1, =.numbers_str
-	mov	a2, ' @
-	bl	explode
+	mov	r0, v4
 	bl	strings_to_ints
+
+	mov	v2, r0
+	mov	v3, r1
 	
-	mov	v1, r0
-	mov	v2, r1
+	@ free string of strings, buffer of buffers, one pointer to rule them all.
+	mov	v5, v4
+.royal_free_loop:
+	ldr	r0, [v5], 4
+	cmp	r0, 0
+	beq	.royal_free_loop_end
+	bl	free
+	b	.royal_free_loop
+	
+.royal_free_loop_end:
+	mov	r0, v4
+	bl	free
+
+	@ process ints
+	cmp	v2, 0
+	beq	.error
+
+	mov	r0, v2
+	mov	r1, v3
 	bl	merge_sort
-	
-	mov	a1, v1
-	mov	a2, v2
-	mov	a3, '_
+
+	mov	r0, v2
+	mov	r1, v3
+	mov	r2, '\n
+
 	bl	ints_to_string
-	bl	puts
 
+	mov	v3, r0
+	mov	r0, v2
+	bl	free
 
-.end_numbers_loop:
+	cmp	v3, 0
+	beq	.error
 
+	mov	r0, v1
+	mov	r1, v3
+	bl	file_output
+
+	mov	r0, v3
+	bl	free
+	
+	@ and they lived happily ever after
+.good_ending:
 	mov	r0, 0
+	@ fall through
+.end:
 	sub	sp, fp, .fp_reg_offset
-	pop	{v1, v2, fp, pc}
+	pop	{v1, v2, v3, v4, v5, fp, pc}
 
-.hello: .asciz "Hello World!\n"
-.file_name: .asciz "testfile.txt"
-.string_to_explode: .asciz "hello world again. how are you?"
-.explode_output: .asciz "%s\n"
-.number_str: .asciz "12345"
-.number_output: .asciz "Parsed: %d\n"
-.numbers_str: .asciz "45 4t356 24    456 2 1 0  2 4 5  "
+.error:
+	mov	r0, -1
+	b	.end
+
+.usage:
+	ldr	r0, =.usage_str
+	bl	printf
+	b	.good_ending
+	
+
+	.section	.rodata
+.usage_str: .asciz "To use call with two file names as arguments.\n"

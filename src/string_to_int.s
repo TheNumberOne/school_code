@@ -59,7 +59,7 @@ strings_to_ints:
 	@ fall through
 .return:
 	sub	sp, fp, .fp_reg_offset
-	pop	{ v1, v2, v4, fp, pc }
+	pop	{ v1, v2, v3, fp, pc }
 .return_null:
 	mov	r0, 0
 	mov	r1, 0
@@ -74,8 +74,10 @@ string_to_int:
 	@ r0 is the integer currently being parsed
 	@ r1 is the pointer to the string
 	@ r2 is the current character
+	@ r3 is 10
 	mov	r1, a1
 	mov	r0, 0
+	mov	r3, 10
 .loop:
 	ldrb	r2, [r1], 1
 
@@ -89,8 +91,7 @@ string_to_int:
 	cmp	r2, '9
 	bgt	.invalid
 
-	@ r0 = 10 * r0 + (r3 - '0')
-	mov	r3, 10
+	@ r0 = 10 * r0 + (r2 - '0')
 	mul	r0, r3
 	sub	r2, '0
 	add	r0, r2

@@ -173,7 +173,7 @@ explode_once:
 
 	@ put null pointer into last character
 	mov	r0, 0
-	str	r0, [v4, +v3]
+	strb	r0, [v4, +v3]
 
 	@ move the buffer pointer forwards.
 	ldr	r0, [v1]

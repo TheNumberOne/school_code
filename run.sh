@@ -1,2 +1,2 @@
 #!/bin/sh
-qemu-arm -L /usr/arm-linux-gnueabi final_project
+qemu-arm -L /usr/arm-linux-gnueabi final_project $@
