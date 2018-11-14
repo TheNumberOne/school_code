@@ -43,15 +43,15 @@ main:
 	bl	strings_to_ints
 	
 	mov	v1, r0
-	add	v2, r0, r1, lsl 2 @ v2 = r0 + (r1 << 2)
+	mov	v2, r1
 	bl	merge_sort
-.numbers_loop:
-	cmp	v1, v2
-	beq	.end_numbers_loop
-	ldr	a1, =.number_output
-	ldr	a2, [v1], 4
-	bl	printf
-	b	.numbers_loop
+	
+	mov	a1, v1
+	mov	a2, v2
+	mov	a3, '_
+	bl	ints_to_string
+	bl	puts
+
 
 .end_numbers_loop:
 
