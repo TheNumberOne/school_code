@@ -17,7 +17,7 @@ ints_to_string:
 	@ [fp - .str_pointer] is the current location in the result.
 	push	{ v1, v2, v3, v4, fp, lr }
 	.set	.regs_saved, 6
-	sub	fp, sp, .fp_reg_offset
+	add	fp, sp, .fp_reg_offset
 
 	sub	sp, 8 @ add 4 bytes for str_pointer and keep aligned
 	.set	.str_pointer, .fp_reg_offset + 4
@@ -59,7 +59,7 @@ ints_to_string:
 	mov	r0, v4
 	@ fall through
 .ints_to_string_return:
-	add	sp, fp, .fp_reg_offset
+	sub	sp, fp, .fp_reg_offset
 	pop	{ v1, v2, v3, v4, fp, pc }
 
 .ints_to_string_return_nothing:
@@ -77,7 +77,7 @@ int_to_string:
 	@ v3 stores the current location of the string
 	push	{ v1, v2, fp, lr }
 	.set	.regs_saved, 4
-	sub	fp, sp, .fp_reg_offset
+	add	fp, sp, .fp_reg_offset
 	@ sub	sp, 4 @ align stack pointer
 	
 
@@ -117,7 +117,7 @@ int_to_string:
 	bne	.int_to_string_loop
 	@ fall through
 .int_to_string_end:
-	add	sp, fp, .fp_reg_offset
+	sub	sp, fp, .fp_reg_offset
 	pop	{ v1, v2, fp, pc }
 	
 	.align	2
@@ -125,7 +125,7 @@ int_to_string:
 length_of_int:
 	push	{ v1, fp, lr }
 	.set	.regs_saved, 3
-	sub	fp, sp, .fp_reg_offset
+	add	fp, sp, .fp_reg_offset
 	sub	sp, 4
 
 	cmp	r0, 0
@@ -145,7 +145,7 @@ length_of_int:
 .length_of_int_end:
 	mov	r0, v1 
 
-	add	sp, fp, .fp_reg_offset
+	sub	sp, fp, .fp_reg_offset
 	pop	{ v1, fp, pc }
 
 	.align	2
@@ -159,7 +159,7 @@ ints_length:
 
 	push	{ v1, v2, v3, fp, lr }
 	.set	.regs_saved, 5
-	sub	fp, sp, .fp_reg_offset
+	add	fp, sp, .fp_reg_offset
 	sub	sp, 4
 	
 	mov	v1, a1
@@ -181,5 +181,5 @@ ints_length:
 
 .ints_length_end:
 	mov	r0, v3
-	add	sp, fp, .fp_reg_offset
+	sub	sp, fp, .fp_reg_offset
 	pop	{ v1, v2, v3, fp, pc }
