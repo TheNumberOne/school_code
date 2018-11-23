@@ -6,9 +6,14 @@
 	.arm
 	.global ints_to_string
 
-@ accepts as input a pointer to an array of integers and
-@ the length of that array and a delimeter. Returns a string containing
-@ all the numbers appended together.
+	@ Converts an array of integers to a string by joining them together.
+	@ 
+	@ r0/a1: A pointer to an array of integers.
+	@ r1/a2: The length of that array.
+	@ r2/a3: The delimeter to use between each integer.
+	@
+	@ Returns a null terminated string of the numbers with the chosen delimeter
+	@ between every number. There is no trailing instance of the character added.
 ints_to_string:
 	@ v1 is current location in the array of integers.
 	@ v2 is the location just past the end of the array of integers.
@@ -66,11 +71,14 @@ ints_to_string:
 	mov	r0, 0
 	b	.ints_to_string_return
 
+	@ Parses an integer to a string.
+	@
+	@ r0/a1: A pointer to a pointer pointing to the location
+	@ to write the string representation of the integer. This pointer
+	@ is updated to point the location directly after the last byte
+	@ written.
+	@ r1/a2: The integer to convert to a string.
 	.align	2
-@ accepts as input a pointer to a pointer to a string
-@ and an integer. It will convert that integer to a string
-@ and append it to the string. It will advance the pointer
-@ forward past the end of the integer.
 int_to_string:
 	@ v1 stores the pointer to pointer to string
 	@ v2 stores the start location in the string
@@ -120,8 +128,8 @@ int_to_string:
 	sub	sp, fp, .fp_reg_offset
 	pop	{ v1, v2, fp, pc }
 	
+	@ accepts an integer as input and returns its length.
 	.align	2
-@ accepts an integer as input and returns its length.
 length_of_int:
 	push	{ v1, fp, lr }
 	.set	.regs_saved, 3
@@ -148,10 +156,10 @@ length_of_int:
 	sub	sp, fp, .fp_reg_offset
 	pop	{ v1, fp, pc }
 
+	@ accepts a pointer to an array of integers and the length of that array.
+	@ This will return the total string length, including
+	@ null pointer, that would hold the result concatenated with one character between every number.
 	.align	2
-@ accepts a pointer to an array of integers and the length of that array.
-@ This will return the total string length, including
-@ null pointer, that would hold the result concatenated with one character between every number.
 ints_length:
 	@ v1 stores the current location in the array of integers.
 	@ v2 stores the end location of the array of integers

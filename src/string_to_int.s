@@ -2,15 +2,18 @@
 
 	.syntax	unified
 	.text
-	.align	2
 	.arm
 	.global string_to_int
 	.global strings_to_ints
 
-@ accepts a null terminated array of strings as input.
-@ Allocates an array of integers of the same size and
-@ parses each string. Returns a pointer to the array
-@ and the number of elements.
+	@ Parses an array of strings.
+	@
+	@ r0/a1: A null terminated array of pointers where each pointer points to a null terminated string.
+	@
+	@ Returns:
+	@	r0: A pointer to a heap allocated array of integers. Must be freed
+	@	r1: The number of integers in the array
+	.align	2
 strings_to_ints:
 	@ v1 holds a pointer to a location in the array
 	@ of strings. v2 holds a pointer to the start of
@@ -66,10 +69,13 @@ strings_to_ints:
 	b	.return
 
 	.align 2
-@ accepts a single argument,
-@ a pointer to a string.
-@ This parses the string into an integer.
-@ if the string can't be parsed, returns -1.
+	
+	@ Parses a string to an integer.
+	@ 
+	@ r0/a1: a pointer to a null terminated string.
+	@
+	@ Returns: The string parsed into an integer. If there are 
+	@ any non digit characters, -1 is returned.
 string_to_int:
 	@ r0 is the integer currently being parsed
 	@ r1 is the pointer to the string

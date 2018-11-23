@@ -4,10 +4,12 @@
 	.syntax	unified
 	.global	file_output
 	.text
+
+	@ This writes a string to a file, overwriting any contents in the file.
+	@
+	@ r0/a1: The name of the file.
+	@ r1/a2: The string to write.
 	.align	2
-@ Takes two parameters. The first parameter is a file name.
-@ The second parameter is a string to write. This appends to the
-@ file.
 file_output:
 	push	{ v1, fp, lr }
 	.set	.regs_saved, 3

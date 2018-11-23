@@ -2,15 +2,20 @@
 
 	.syntax	unified
 	.text
-	.align	2
 	.arm
 	.global explode
 	
-	@ Accepts a pointer to a string and a delimeter
-	@ returns a pointer to a buffer of pointers.
-	@ Each pointer points to a buffer. These buffers
-	@ hold the strings between the delimeters. Returns
-	@ null if something went wrong.
+	@ Splits a string by a designated delimeter.
+	@
+	@ Note: Does not modify the passed in string.
+	@
+	@ r0/a1: A pointer to a null terminated string.
+	@ r1/a2: A single byte containing the delimeter to split by.
+	@
+	@ Returns: A pointer to a null terminated heap allocated array of pointers. Each
+	@ pointer points to a heap allocated null terminated string containing the split text.
+	@ The returned array and strings must be freed.
+	.align	2
 explode:
 	@ v1 is the delimeter passed in
 	@ v2 is the pointer to the buffer of buffers
@@ -120,13 +125,19 @@ explode:
 	pop 	{ v1, v2, v3, v4, fp, pc }
 
 
-	@ Accepts a pointer to a string pointer and a delimeter
-	@ character. It advanced the string pointer until it 
-	@ no longer points to a delimeter. It then takes
-	@ all the characters up til the next instance of the
-	@ delimeter and puts that into a c string. It then
-	@ returns the c string and advances the string pointer
-	@ to point to the next character.
+	@ This returns the text up to a specified delimeter. And leading
+	@ repeats of the delimeter are ignored.
+	@
+	@ Note: Does not modify the string passed in. However it does modify the location
+	@ in the string that's passed in.
+	@
+	@ r0/a1: A pointer to a pointer pointing to a location in a string.
+	@	 This position is updated past the text returned.
+	@ r1/a2: A delimeter character.
+	@
+	@ Returns a pointer to a heap allocated null terminated string containing the text
+	@ before the delimeter (leading instances of the delimeter are ignored).
+	@ This string must be freed.
 explode_once:
 	@ v1 is the pointer to a string pointer
 	@ v2 is the delimeter character

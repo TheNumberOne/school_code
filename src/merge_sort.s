@@ -6,8 +6,12 @@
 	.arm
 	.global merge_sort
 
-@ takes as input a pointer to an integer array and the length of the
-@ array. Sorts the array and returns nothing.
+	@ Sorts an array of integers using merge sort.
+	@
+	@ r0/a1: A pointer to an array of intgers
+	@ r1/a2: The length of the array.
+	@
+	@ Returns r0/a1. The array is sorted.
 merge_sort:
 	push	{ v1, v2, v3, fp, lr }
 	.set	.regs_saved, 5
@@ -17,11 +21,20 @@ merge_sort:
 	@ the array is automatically sorted if it is 1 length or less.
 	cmp	a2, 1
 	ble	.merge_sort_end
-
+	
+	@ v1 = pointer to start of array.
+	@ v2 = pointer to middle
+	@ v3 = pointer to end
 	mov	v1, a1
-	add	v3, a1, a2, lsl 2 @ v3 = a1 + (a2 << 2)
+
+	@ left shift by two because each integer is 4 bytes.
+	add	v3, a1, a2, lsl 2
+
+	@ right shift to divide by two to get middle index.
 	lsr	v2, a2, 1
-	add	v2, a1, v2, lsl 2 @ v2 = a1 + (a2/2 << 2)
+
+	@ left shift by two again because each integer is 4 bytes
+	add	v2, a1, v2, lsl 2
 
 	mov	a1, v1
 	sub	a2, v2, v1
@@ -33,18 +46,27 @@ merge_sort:
 	lsr	a2, 2
 	bl	merge_sort
 
+	@ would probably be better to use the same array to do all the merging
+	@ instead of allocating a new one each time.
 	mov	a1, v1
 	mov	a2, v2
 	mov	a3, v3
 	bl	merge
 
 .merge_sort_end:
+	mov	r0, v1
+
 	sub	sp, fp, .fp_reg_offset
 	pop	{ v1, v2, v3, fp, pc }
 
-
-@ takes three parameters. They point to the start, middle, and end
-@ of two adjacent arrays to merge.
+	@ Performs the merge portion of merge sort.
+	@
+	@ Would probably improve performance to not allocate an
+	@ array for each merge but to instead pass one in.
+	@
+	@ r0/a1: A pointer to the start of the area to merge
+	@ r1/a2: A pointer to the start of the second area to merge/end of first area.
+	@ r2/a3: A pointer to the end of the second area to merge.
 merge:
 	push	{ v1, v2, v3, v4, v5, fp, lr }
 	.set	.regs_saved, 7

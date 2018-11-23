@@ -1,27 +1,19 @@
 	.eqv	.fp_reg_offset, .regs_saved*4 - 4
 
 	.text
-@	.global	main
 	.global read_file
 	.syntax unified
 	.arm
-	.align	2
-@main:
-@	push	{fp, lr}
-@	.set	.regs_saved, 2
-@	add	fp, sp, .fp_reg_offset
-@	
-@	ldr	a1, =.file_name
-@	bl	read_file
-@	bl	puts
-@
-@	mov	r0, 0
-@	sub	sp, fp, .fp_reg_offset
-@	pop	{fp, pc}
-@
-@.hello: .asciz "Hello World!\n"
-@.file_name: .asciz "testfile.txt"
 
+	@ Reads a file. 
+	@
+	@ Note: Doesn't determine size of file before allocating string containing
+	@ the contents. It instead reallocates the string to grow it as needed until
+	@ it can fit the entire file.
+	@
+	@ accepts one argument: a pointer to a c_string passed through r0/a1
+	@ returns: a pointer to a heap allocated c_string containing the contents
+	@ of the file. This pointer must later be freed.
 	.align 2
 read_file:
 	push {r4, r5, r6, r7, fp, lr}
@@ -106,11 +98,6 @@ read_file:
 	sub sp, fp, .fp_reg_offset
 	pop {r4, r5, r6, r7, fp, pc}
 	
-
-
-
-
-
-
+	.section	.rodata
 .read_file_flags: .asciz "r"
 .error_reading_file_str: .asciz "Error reading file: %d\n"
