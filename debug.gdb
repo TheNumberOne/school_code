@@ -4,5 +4,5 @@ file final_project
 target remote localhost:1111
 break main
 continue
-layout asm
+layout src
 layout regs

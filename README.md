@@ -1,9 +1,5 @@
 # Final Project for CS2275
 
-The build and run files on here are for building/running on ubuntu.
-
-Packages installed on ubuntu: `qemu-system`, `arm-linux-gnueabi`, `arm-linux-gnueabi-dbg`, `gcc-arm-linux-gnueabi`, `gdb-multiarch`
-
 To build simply do `make` on a raspberry pi. Binary is `final_project`. To call do: `final_project input.txt output.txt`.  
 
 Input format is a comma separated list of positive integers. Any invalid numbers will be converted to -1, along with adjacent
@@ -25,3 +21,8 @@ This will generate the numbers `1` to `n` in a random order and insert them into
 Another script is the `run.sh` script. This script executes `final_project` on the qemu arm virtual machine and forwards all arguments
 to it. `debug.sh` is similar. However, it also opens a gdb console and pauses the program at the start of the `main` function. Both of
 these two scripts are intended to be ran on ubuntu. They would likely work on other systems though.
+
+Similarly, `ubuntu_make.sh` will make the program. However, it is designed to only work on ubuntu. For this project to work correctly on ubuntu,
+the following packages must be installed:
+
+Packages installed on ubuntu: `qemu-system`, `arm-linux-gnueabi`, `arm-linux-gnueabi-dbg`, `gcc-arm-linux-gnueabi`, `gdb-multiarch`
