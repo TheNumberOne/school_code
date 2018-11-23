@@ -1,3 +1,9 @@
+
+	.set	.delimeter, ',
+	.set	.explode_delimeter, .delimeter
+	.set	.output_delimeter, .delimeter
+
+
 	.eqv	.fp_reg_offset, .regs_saved*4 - 4
 	.syntax	unified
 	.text
@@ -28,7 +34,7 @@ main:
 	
 	mov	v2, r0  @ remember string so we can free it
 
-	mov	a2, '\n
+	mov	a2, .explode_delimeter
 	bl	explode
 
 	mov	v4, r0
@@ -67,7 +73,7 @@ main:
 
 	mov	r0, v2
 	mov	r1, v3
-	mov	r2, '\n
+	mov	r2, .output_delimeter
 
 	bl	ints_to_string
 
