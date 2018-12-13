@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Tanks.utils
 {
@@ -11,6 +8,14 @@ namespace Tanks.utils
         public static double Range(this Random r, double min, double max)
         {
             return r.NextDouble() * (max - min) + min;
+        }
+
+        public static PointF In(this Random r, RectangleF rect)
+        {
+            return new PointF(
+                (float) r.Range(rect.Left, rect.Right),
+                (float) r.Range(rect.Top, rect.Bottom)
+            );
         }
     }
 }

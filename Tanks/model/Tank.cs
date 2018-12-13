@@ -9,14 +9,25 @@ namespace Tanks.model
         public const float RotationNone = 0;
         public const float RotationClockwise = 1;
         public const float RotationCounterclockwise = -RotationClockwise;
-        public const float MoveForward = 30;
+        public const float MoveForward = 60;
         public const float MoveBackwards = -MoveForward;
         public const float MoveNone = 0;
 
+        private const float BulletSpeed = 10 * MoveForward;
+
+        private const float StartLife = 10;
         private const float Size = 10;
+        private PointF _previousLocation;
+        public PointF Location;
+
+        public Tank MissileTarget { get; set; }
 
 
-        private static Shape ShapePrototype { get; } = new []
+        public readonly float MaxRadius = (float) (Math.Sqrt(2) * Size);
+        
+        private static PointF StartingBulletVelocity { get; } = new PointF(BulletSpeed, 0);
+        
+        private static Shape ShapePrototype { get; } = new[]
         {
             new PointF(-1, -1),
             new PointF(1, -1),
@@ -28,12 +39,15 @@ namespace Tanks.model
         public PointF Gun => TransformPrototype(GunPrototype);
 
         public Shape Border => ShapePrototype.Transform(TransformPrototype);
-        public PointF Location;
+        private float PreviousAngle { get; set; }
         public float Angle { get; set; }
 
         public float Rotation { get; set; } = RotationNone;
-
         public float Movement { get; set; } = MoveNone;
+
+        public float Life { get; set; } = StartLife;
+        public bool IsAlive => Life > 0;
+        public float MaxLife { get; } = StartLife;
 
         private PointF TransformPrototype(PointF p)
         {
@@ -42,31 +56,49 @@ namespace Tanks.model
 
         public void Update(TimeSpan delta)
         {
-            double dt = delta.TotalSeconds;
-
+            var dt = delta.TotalSeconds;
+            _previousLocation = Location;
+            PreviousAngle = Angle;
+            
             Location.X += (float) (Movement * Math.Cos(Angle) * dt);
             Location.Y += (float) (Movement * Math.Sin(Angle) * dt);
             Angle += (float) (Rotation * dt);
         }
 
-//        public bool Alive { get; }
-//        public int Life { get; }
-//        public Shape Shape { get; }
-//        private ITankOperator Operator { get; }
-//
-//        public void CheckCollision(Rock rock)
-//        {
-//            throw new NotImplementedException();
-//        }
-//
-//        public Tank(Vector initialLocation, ITankOperator tankOperator)
-//        {
-//            throw new NotImplementedException();
-//        }
-//
-//        public void Update(double t)
-//        {
-//            throw new NotImplementedException();
-//        }
+        public void UndoUpdate()
+        {
+            Location = _previousLocation;
+            Angle = PreviousAngle;
+        }
+        
+        public delegate void OnShootEventHandler(Bullet bullet);
+
+        public delegate void OnFireMissileEventHandler(Missile missile);
+
+        public event OnShootEventHandler OnShoot;
+        public event OnFireMissileEventHandler OnFireMissile;
+
+        public void FireMissile()
+        {
+            OnFireMissile?.Invoke(new Missile
+            {
+                Location = Location,
+                Velocity = new PointF(0, 0),
+                Angle = Angle,
+                Owner = this,
+                Target = MissileTarget
+            });
+        }
+
+        public void Shoot()
+        {
+            OnShoot?.Invoke(new Bullet
+            {
+                Location = Gun,
+                Velocity = StartingBulletVelocity.Rotate(Angle),
+                LifeTime = 1,
+                Firer = this
+            });
+        }
     }
 }

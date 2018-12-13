@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -39,8 +38,13 @@ namespace Tanks.utils
             );
         }
 
+        public static float Distance(this PointF p1, PointF p2)
+        {
+            return (float) Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y));
+        }
+
         /// <summary>
-        /// Returns the convex hull of the points. Uses: https://en.wikipedia.org/wiki/Graham_scan
+        ///     Returns the convex hull of the points. Uses: https://en.wikipedia.org/wiki/Graham_scan
         /// </summary>
         /// <param name="points"></param>
         /// <returns></returns>
@@ -48,31 +52,31 @@ namespace Tanks.utils
         {
             if (points.Length < 3) return points;
 
-            PointF[] ps = points.ToArray();
-            int smallestIndex = Enumerable.Range(0, ps.Length).MinBy(i => ps[i].Y).First();
+            var ps = points.ToArray();
+            var smallestIndex = Enumerable.Range(0, ps.Length).MinBy(i => ps[i].Y).First();
 
             (ps[smallestIndex], ps[0]) = (ps[0], ps[smallestIndex]);
-           
+
 
             Array.Sort(ps, 1, ps.Length - 1, Comparer<PointF>.Create((a, b) =>
             {
-                float slope1 = (a.X - ps[0].X) / (a.Y - ps[0].Y);
-                float slope2 = (b.X - ps[0].X) / (b.Y - ps[0].Y);
+                var slope1 = (a.X - ps[0].X) / (a.Y - ps[0].Y);
+                var slope2 = (b.X - ps[0].X) / (b.Y - ps[0].Y);
                 return Math.Sign(slope2 - slope1);
             }));
 
-            Stack<PointF> hull = new Stack<PointF>();
+            var hull = new Stack<PointF>();
             hull.Push(ps[0]);
             hull.Push(ps[1]);
             hull.Push(ps[2]);
 
-            for (int i = 3; i < ps.Length; i++)
+            for (var i = 3; i < ps.Length; i++)
             {
                 while (true)
                 {
-                    PointF top = hull.Pop();
-                    if (CounterClockWiseness(top, hull.Peek(), ps[i]) > 0) continue;
-                    
+                    var top = hull.Pop();
+                    if (SignedTriangleArea(top, hull.Peek(), ps[i]) > 0) continue;
+
                     hull.Push(top);
                     break;
                 }
@@ -84,12 +88,10 @@ namespace Tanks.utils
         }
 
         /// <summary>
-        /// Calculates whether the three points are counter clockwise or not.
-        /// Returns &gt; 0 if counter clockwise.
-        /// Returns &lt; 0 if clockwise.
-        /// Returns 0 if collinear.
+        ///     Returns twice the triangle area between the 3 points. Positive if counter clockwise.
+        ///     Negative if clockwise.
         /// </summary>
-        public static float CounterClockWiseness(PointF p1, PointF p2, PointF p3)
+        public static float SignedTriangleArea(PointF p1, PointF p2, PointF p3)
         {
             return (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
         }

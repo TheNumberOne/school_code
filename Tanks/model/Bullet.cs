@@ -1,41 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tanks.model;
+using Tanks.utils;
 
 namespace Tanks
 {
     /// <summary>
-    /// This represents a bullet shot by one of the tanks.
+    ///     This represents a bullet shot by one of the tanks.
     /// </summary>
     public class Bullet
     {
-        public Vector Location { get; }
-        private Vector Velocity { get; }
-        private double LifeTime { get; }
-        public bool Alive { get; }
+        public Tank Firer { get; set; }
+        public PointF Location;
+        public PointF PreviousLocation;
+        public PointF Velocity;
+        public double LifeTime { get; set; }
+        public bool Alive => LifeTime > 0;
 
-        public Bullet(Point location, Point velocity, double lifeTime)
+        public void Update(TimeSpan t)
         {
-            throw new NotImplementedException();
+            var time = (float) Math.Min(LifeTime, t.TotalSeconds);
+            PreviousLocation = Location;
+            Location = Location.Plus(Velocity.Times(time));
+            LifeTime -= time;
         }
 
-        public void Update(double deltaT)
+        public Shape GetMovementLine()
         {
-            throw new NotImplementedException();
+            return new[] {PreviousLocation, Location};
         }
 
         public bool CheckCollision(Missile missile)
         {
             throw new NotImplementedException();
         }
+
         public bool CheckCollision(Rock missile)
         {
             throw new NotImplementedException();
         }
+
         public bool CheckCollision(Tank missile)
         {
             throw new NotImplementedException();
