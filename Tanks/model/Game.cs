@@ -12,12 +12,14 @@ namespace Tanks.model
     /// <summary>
     ///     Represents the current game running.
     /// </summary>
-    public class Game: IUpdateable
+    public class Game : IUpdateable
     {
-        /// <summary>
-        ///     The current number of enemies on the field.
-        /// </summary>
-        private int NumEnemies { get; set; } = 1;
+        private const float TimePerDifficultyIncrease = 10;
+        private const float SecondsBetweenPlayerShots = .1f;
+        private const float SecondsBetweenEnemyShots = 5;
+        private const float BulletDamage = 1;
+        private const float TankTankCollisionDamageRate = 5;
+        private const float TankRockCollisionDamageRate = 5;
 
         /// <summary>
         ///     Creates a new game that takes place in the given rectangle.
@@ -27,10 +29,75 @@ namespace Tanks.model
         {
             Rocks = new RandomRockFactory(Random).GenerateRocks(rect).ToList();
             Bounds = rect;
-            
+
             CreatePlayer();
             CenterPlayer();
             WrapStuff();
+            AddEnemies();
+        }
+
+        /// <summary>
+        ///     The current number of enemies on the field.
+        /// </summary>
+        private int NumEnemies { get; set; } = 1;
+
+        public List<Rock> Rocks { get; }
+
+        /// <summary>
+        ///     The RNG used for everything.
+        /// </summary>
+        private Random Random { get; } = new Random();
+
+        private RectangleF Bounds { get; }
+        public Tank Player { get; private set; }
+        public List<Bullet> Bullets { get; } = new List<Bullet>();
+
+        /// <summary>
+        ///     The enemy tanks of the player.
+        /// </summary>
+        public List<Tank> Enemies { get; } = new List<Tank>();
+
+        /// <summary>
+        ///     Represents all tanks on the field.
+        /// </summary>
+        private IEnumerable<Tank> Tanks => Enemies.Append(Player);
+
+        /// <summary>
+        ///     The current score of the player
+        /// </summary>
+        public int Score { get; private set; }
+
+        public List<Missile> Missiles { get; } = new List<Missile>();
+
+        /// <summary>
+        ///     The AIs controlling the enemy tanks.
+        /// </summary>
+        private List<TankAi> EnemyAis { get; } = new List<TankAi>();
+
+        /// <summary>
+        ///     A boolean to return if this game is over now or not.
+        /// </summary>
+        public bool IsOver => !Player.Alive;
+
+
+        private float TimeSinceLastDifficultIncrease { get; set; }
+
+        /// <summary>
+        ///     A collection of everything that can be updated in this.
+        /// </summary>
+        private IEnumerable<IUpdateable> AllUpdatables =>
+            EnemyAis.AsEnumerable<IUpdateable>().Concat(Tanks).Concat(Bullets).Concat(Missiles);
+
+        /// <inheritdoc />
+        public void Update(TimeSpan deltaT)
+        {
+            foreach (var u in AllUpdatables) u.Update(deltaT);
+
+            HandleCollisions(deltaT);
+            RemoveDeadStuff();
+            CenterPlayer();
+            WrapStuff();
+            CheckDifficultyIncrease(deltaT);
             AddEnemies();
         }
 
@@ -46,7 +113,7 @@ namespace Tanks.model
             };
             tank.OnShoot += Bullets.Add;
             tank.OnFireMissile += Missiles.Add;
-            
+
             PlacePlayer(tank);
             Player = tank;
         }
@@ -63,51 +130,12 @@ namespace Tanks.model
             } while (IsCollidedWithRocks(tank));
         }
 
-        public List<Rock> Rocks { get; }
-
         /// <summary>
-        ///     The RNG used for everything.
-        /// </summary>
-        private Random Random { get; } = new Random();
-        private RectangleF Bounds { get; }
-        public Tank Player { get; private set; }
-        public List<Bullet> Bullets { get; } = new List<Bullet>();
-        
-        /// <summary>
-        ///     The enemy tanks of the player.
-        /// </summary>
-        public List<Tank> Enemies { get; } = new List<Tank>();
-        
-        /// <summary>
-        ///     Represents all tanks on the field.
-        /// </summary>
-        private IEnumerable<Tank> Tanks => Enemies.Append(Player);
-        
-        /// <summary>
-        ///     The current score of the player
-        /// </summary>
-        public int Score { get; private set; }
-        public List<Missile> Missiles { get; } = new List<Missile>();
-        
-        /// <summary>
-        ///     The AIs controlling the enemy tanks.
-        /// </summary>
-        private List<TankAi> EnemyAis { get; } = new List<TankAi>();
-
-        /// <summary>
-        ///     A boolean to return if this game is over now or not.
-        /// </summary>
-        public bool IsOver => !Player.Alive;
-
-        /// <summary>
-        ///     Keeps adding enemy tanks until it reaches the amount specified by <see cref="NumEnemies"/>.
+        ///     Keeps adding enemy tanks until it reaches the amount specified by <see cref="NumEnemies" />.
         /// </summary>
         private void AddEnemies()
         {
-            while (Enemies.Count < NumEnemies)
-            {
-                AddEnemy();
-            }
+            while (Enemies.Count < NumEnemies) AddEnemy();
         }
 
         /// <summary>
@@ -131,7 +159,7 @@ namespace Tanks.model
                 SecondsBetweenShots = SecondsBetweenEnemyShots,
                 SecondsSinceLastShot = Random.RangeF(0, SecondsBetweenEnemyShots)
             };
-            
+
             tank.OnShoot += Bullets.Add;
             PlaceEnemyTank(tank);
 
@@ -155,35 +183,8 @@ namespace Tanks.model
         /// </summary>
         private bool IsNearPlayer(Tank tank)
         {
-            return Math.Abs(tank.Location.X - Player.Location.X) < Bounds.Width / 4 
-                   && Math.Abs(tank.Location.Y - Player.Location.Y) < Bounds.Height/ 4;
-        }
-
-
-        private float TimeSinceLastDifficultIncrease { get; set; }
-        private const float TimePerDifficultyIncrease = 10;
-        private const float SecondsBetweenPlayerShots = .1f;
-        private const float SecondsBetweenEnemyShots = 5;
-        private const float BulletDamage = 1;
-        private const float TankTankCollisionDamageRate = 5;
-        private const float TankRockCollisionDamageRate = 5;
-
-        /// <summary>
-        ///     A collection of everything that can be updated in this.
-        /// </summary>
-        private IEnumerable<IUpdateable> AllUpdatables => EnemyAis.AsEnumerable<IUpdateable>().Concat(Tanks).Concat(Bullets).Concat(Missiles);
-        
-        /// <inheritdoc />
-        public void Update(TimeSpan deltaT)
-        {
-            foreach (var u in AllUpdatables) u.Update(deltaT);
-
-            HandleCollisions(deltaT);
-            RemoveDeadStuff();
-            CenterPlayer();
-            WrapStuff();
-            CheckDifficultyIncrease(deltaT);
-            AddEnemies();
+            return Math.Abs(tank.Location.X - Player.Location.X) < Bounds.Width / 4
+                   && Math.Abs(tank.Location.Y - Player.Location.Y) < Bounds.Height / 4;
         }
 
         /// <summary>
@@ -231,7 +232,7 @@ namespace Tanks.model
                 if (!target.Alive) continue;
 
                 if (!target.IsCollision(missile)) continue;
-                
+
                 target.Life = 0;
                 CheckKill(missile.Firer);
             }
@@ -251,9 +252,8 @@ namespace Tanks.model
         private void HandleBulletRockCollisions()
         {
             foreach (var bullet in Bullets)
-            {
-                if (Rocks.Any(r => r.IsCollision(bullet))) bullet.LifeTime = 0;
-            }
+                if (Rocks.Any(r => r.IsCollision(bullet)))
+                    bullet.LifeTime = 0;
         }
 
         /// <summary>

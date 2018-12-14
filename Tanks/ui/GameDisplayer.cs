@@ -20,6 +20,18 @@ namespace Tanks.ui
         /// </summary>
         private const float TankCrosshairMultiplier = 2.25f;
 
+        /// <summary>
+        ///     The gun display starts this fraction of the way from the center of the tank to the location of the gun.
+        /// </summary>
+        private const float FractionTankGunInset = .7f;
+
+        /// <summary>
+        ///     The gun extends to this far out relative to the center of the tank from the location of the gun.
+        /// </summary>
+        private const float FractionTankGunOutset = 1.5f;
+
+        private const float MissileLength = 10;
+
         private static readonly Brush EnemyBrush = new SolidBrush(Color.CornflowerBlue);
         private static readonly Brush PlayerBrush = new SolidBrush(Color.Brown);
         private static readonly Brush RockBrush = new SolidBrush(Color.DimGray);
@@ -35,18 +47,6 @@ namespace Tanks.ui
         private static readonly Font InstructionsFont = new Font(FontFamily.GenericSansSerif, 10);
         private static readonly Pen BulletPen = new Pen(Color.Black);
         private static readonly Pen MissilePen = new Pen(Color.Goldenrod, 3);
-
-        /// <summary>
-        ///     The gun display starts this fraction of the way from the center of the tank to the location of the gun.
-        /// </summary>
-        private const float FractionTankGunInset = .7f;
-        
-        /// <summary>
-        ///     The gun extends to this far out relative to the center of the tank from the location of the gun.
-        /// </summary>
-        private const float FractionTankGunOutset = 1.5f;
-
-        private const float MissileLength = 10;
 
         /// <summary>
         ///     Displays the entire game on the specified graphics.

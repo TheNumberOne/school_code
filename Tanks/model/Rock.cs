@@ -7,12 +7,13 @@ namespace Tanks.model
     /// <summary>
     ///     Represents a rock in the game.
     /// </summary>
-    public class Rock: ICollidable
+    public class Rock : ICollidable
     {
         /// <summary>
         ///     Used to cache the border. Useful for decreasing slow game speeds.
         /// </summary>
         private Shape _borderCache;
+
         private PointF _borderCacheCenter;
 
         public PointF Location;
@@ -36,7 +37,7 @@ namespace Tanks.model
                 return _borderCache ?? (_borderCache = Prototype.Transform(p => p.Plus(Location)));
             }
         }
-        
+
         /// <inheritdoc />
         public Shape CollisionContainer => Border;
     }

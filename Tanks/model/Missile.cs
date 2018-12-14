@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Linq;
 using MathNet.Numerics;
-using MoreLinq.Extensions;
 using Tanks.utils;
 
 namespace Tanks.model
@@ -20,8 +19,6 @@ namespace Tanks.model
         public PointF Velocity;
         public float Angle { get; set; }
 
-        private float PreviousTimeToCollision { get; set; }
-
         /// <summary>
         ///     The tank that fired this missile.
         /// </summary>
@@ -31,6 +28,9 @@ namespace Tanks.model
         ///     The tank this missile is targeting.
         /// </summary>
         public Tank Target { get; set; }
+
+        /// <inheritdoc />
+        public Shape CollisionContainer => new[] {_previousLocation, Location};
 
         /// <inheritdoc />
         public void Update(TimeSpan deltaT)
@@ -85,7 +85,7 @@ namespace Tanks.model
         private float DetermineTimeToCollision()
         {
             var location = Location.Minus(Target.Location);
-            
+
             // Derived by hand.
             // ||p+vt|| is the distance to the origin at time t assuming a straight line.
             // at^2/2 is the distance it's possible to travel through acceleration
@@ -94,11 +94,11 @@ namespace Tanks.model
             // (p+vt).(p+vt) = a^2t^4/4
             // (a^2/4)t^4 - (v.v)t^2 - 2(p.v)t - p.p = 0
             var poly = new Polynomial(
-                - location.Dot(location),      // -p.p
-                - 2 * location.Dot(Velocity),  // -2p.v
-                - Velocity.Dot(Velocity),      // -v.v
+                -location.Dot(location), // -p.p
+                -2 * location.Dot(Velocity), // -2p.v
+                -Velocity.Dot(Velocity), // -v.v
                 0,
-                MissileAcceleration * MissileAcceleration / 4  // a^2 / 4
+                MissileAcceleration * MissileAcceleration / 4 // a^2 / 4
             );
 
             var roots = poly.Roots();
@@ -106,8 +106,5 @@ namespace Tanks.model
             var t = roots.Where(it => it.IsRealNonNegative()).Min(it => it.Real);
             return (float) t;
         }
-
-        /// <inheritdoc />
-        public Shape CollisionContainer => new[] {_previousLocation, Location};
     }
 }

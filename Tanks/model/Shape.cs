@@ -94,14 +94,14 @@ namespace Tanks.model
     /// </summary>
     internal class Edge
     {
-        private PointF P1 { get; }
-        private PointF P2 { get; }
-
         private Edge(PointF p1, PointF p2)
         {
             P1 = p1;
             P2 = p2;
         }
+
+        private PointF P1 { get; }
+        private PointF P2 { get; }
 
         /// <summary>
         ///     Determines if there's a collision between the two edges.
@@ -113,7 +113,7 @@ namespace Tanks.model
             var a2 = Utils.SignedTriangleArea(P1, P2, other.P1);
             if (a1 * a2 >= 0) return false;
             var a3 = Utils.SignedTriangleArea(other.P1, other.P2, P1);
-            
+
             //float a4 = Utils.SignedTriangleArea(other.P1, other.P2, P2);
             var a4 = a3 + a2 - a1;
 

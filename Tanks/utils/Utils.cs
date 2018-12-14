@@ -6,7 +6,7 @@ namespace Tanks.utils
     public static partial class Utils
     {
         public const float RadiansPerRotation = (float) (Math.PI * 2);
-        
+
         /// <summary>
         ///     Get the total seconds of this timespan in single precision floating point.
         ///     (Mainly so we don't have to cast stuff everywhere.

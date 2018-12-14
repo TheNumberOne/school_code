@@ -8,7 +8,7 @@ namespace Tanks.tankOperators
     /// <summary>
     ///     A simple ai for our enemy tanks.
     /// </summary>
-    public class TankAi: IUpdateable
+    public class TankAi : IUpdateable
     {
         public Tank Tank { get; set; }
         public Game Game { get; set; }

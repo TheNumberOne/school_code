@@ -15,6 +15,7 @@ namespace Tanks.model
         ///     The average number of rocks per pixel.
         /// </summary>
         private const double RockDensity = 30.0 / 1_000_000;
+
         private const float MinMinRockRadius = 5;
         private const float MaxMinRockRadius = 15;
         private const float MinMaxRadiusMultiple = 1.2f;
@@ -22,14 +23,14 @@ namespace Tanks.model
         private const float RockGenerationAngleDelta = Utils.RadiansPerRotation / NumBorderPoints;
         private const int NumBorderPoints = 20;
 
-        private Random Random { get; }
-        
-        
+
         public RandomRockFactory(Random random)
         {
             Random = random;
         }
-        
+
+        private Random Random { get; }
+
         /// <summary>
         ///     Generates a set of rocks in the specified rectangle.
         /// </summary>

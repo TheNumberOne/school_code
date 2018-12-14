@@ -41,6 +41,21 @@ namespace Tanks.ui
         }
 
         /// <summary>
+        ///     The current game running.
+        /// </summary>
+        private Game Game { get; }
+
+        /// <summary>
+        ///     The current keys pressed.
+        /// </summary>
+        private HashSet<Keys> KeysPressed { get; } = new HashSet<Keys>();
+
+        /// <summary>
+        ///     The last time the game was updated.
+        /// </summary>
+        private DateTime LastTime { get; set; } = DateTime.Now;
+
+        /// <summary>
         ///     Used to initialize event handlers for the project.
         /// </summary>
         private void AddEventHandlers()
@@ -50,21 +65,6 @@ namespace Tanks.ui
             KeyUp += (_, e) => Tanks_OnKeyUp(e);
             MouseDown += (_, e) => Tanks_OnMouseDown();
         }
-
-        /// <summary>
-        ///     The current game running.
-        /// </summary>
-        private Game Game { get; }
-        
-        /// <summary>
-        ///     The current keys pressed.
-        /// </summary>
-        private HashSet<Keys> KeysPressed { get; } = new HashSet<Keys>();
-        
-        /// <summary>
-        ///     The last time the game was updated.
-        /// </summary>
-        private DateTime LastTime { get; set; } = DateTime.Now;
 
         /// <summary>
         ///     Fire a missile when the mouse is clicked.
@@ -106,7 +106,7 @@ namespace Tanks.ui
         private void UpdateGame()
         {
             if (Game.IsOver) return;
-            
+
             var now = DateTime.Now;
             var deltaT = now - LastTime;
             LastTime = now;

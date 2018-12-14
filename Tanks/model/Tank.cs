@@ -9,13 +9,13 @@ namespace Tanks.model
     /// <summary>
     ///     Represents a tank in our game.
     /// </summary>
-    public class Tank: IUpdateable, ICollidable
+    public class Tank : IUpdateable, ICollidable
     {
         /// <summary>
         ///     The event handler definition for when this tank fires a missile.
         /// </summary>
         public delegate void OnFireMissileEventHandler(Missile missile);
-        
+
         /// <summary>
         ///     The event handler definition for when this tank shoots a bullet.
         /// </summary>
@@ -34,17 +34,18 @@ namespace Tanks.model
         private const float Size = 10;
         private const int BulletLifeTime = 1;
 
-        public float SecondsBetweenShots { get; set; }
-        public float SecondsSinceLastShot { get; set; }
-
 
         public readonly float MaxRadius = (float) (Math.Sqrt(2) * Size); // sqrt 2 for long diagonal of square.
-        
+
         /// <summary>
         ///     Used to reset the tank's previous location if there is a collision.
         /// </summary>
         private PointF _previousLocation;
+
         public PointF Location;
+
+        public float SecondsBetweenShots { get; set; }
+        public float SecondsSinceLastShot { get; set; }
 
         /// <summary>
         ///     The current target that will be fired at when a missile is shot.
@@ -66,7 +67,7 @@ namespace Tanks.model
         ///     The location on the shape prototype that our gun is.
         /// </summary>
         private static PointF GunPrototype { get; } = new PointF(1, 0);
-        
+
         /// <summary>
         ///     The location that this tank's gun is at.
         /// </summary>
@@ -76,12 +77,12 @@ namespace Tanks.model
         ///     The current border of this tank.
         /// </summary>
         public Shape Border => ShapePrototype.Transform(TransformPrototype);
-        
+
         /// <summary>
         ///     Used to reset the tank's previous location if there is a collision.
         /// </summary>
         private float PreviousAngle { get; set; }
-        
+
         /// <summary>
         ///     The angle that the tank is rotated to point at.
         /// </summary>
@@ -89,13 +90,13 @@ namespace Tanks.model
 
         /// <summary>
         ///     The rotation direction that this tank is currently rotating. Set to one of
-        ///     <see cref="RotationNone"/>, <see cref="RotationClockwise"/>, or <see cref="RotationCounterclockwise"/>.
+        ///     <see cref="RotationNone" />, <see cref="RotationClockwise" />, or <see cref="RotationCounterclockwise" />.
         /// </summary>
         public float Rotation { get; set; } = RotationNone;
-        
+
         /// <summary>
-        ///     The movement that this tank is currently performing. Set to one of <see cref="MoveForward"/>,
-        ///     <see cref="MoveBackwards"/>, or <see cref="MoveNone"/>.
+        ///     The movement that this tank is currently performing. Set to one of <see cref="MoveForward" />,
+        ///     <see cref="MoveBackwards" />, or <see cref="MoveNone" />.
         /// </summary>
         public float Movement { get; set; } = MoveNone;
 
@@ -103,13 +104,10 @@ namespace Tanks.model
         public bool Alive => Life > 0;
         public float MaxLife { get; } = StartLife;
 
-        /// <summary>
-        ///     Transforms the prototype points for our shape and gun to their actual locations.
-        /// </summary>
-        private PointF TransformPrototype(PointF p)
-        {
-            return p.Rotate(Angle).Times(Size).Plus(Location);
-        }
+        public PointF Velocity => Utils.PolarToPointF(Angle, Movement);
+
+        /// <inheritdoc />
+        public Shape CollisionContainer => Border;
 
         /// <inheritdoc />
         public void Update(TimeSpan delta)
@@ -119,12 +117,18 @@ namespace Tanks.model
             PreviousAngle = Angle;
 
             Location = Location.Plus(Velocity.Times(dt));
-            
+
             Angle += Rotation * dt;
             SecondsSinceLastShot += dt;
         }
-        
-        public PointF Velocity => Utils.PolarToPointF(Angle, Movement);
+
+        /// <summary>
+        ///     Transforms the prototype points for our shape and gun to their actual locations.
+        /// </summary>
+        private PointF TransformPrototype(PointF p)
+        {
+            return p.Rotate(Angle).Times(Size).Plus(Location);
+        }
 
         /// <summary>
         ///     Undoes the last update, but only undoing the changes in location and angle.
@@ -139,7 +143,7 @@ namespace Tanks.model
         ///     Register your event handlers here if you want to be notified of the gun shooting.
         /// </summary>
         public event OnShootEventHandler OnShoot;
-        
+
         /// <summary>
         ///     Register your event handlers here if you want to be notified of a missile firing.
         /// </summary>
@@ -168,7 +172,7 @@ namespace Tanks.model
         {
             // The shooting is rate limited.
             if (SecondsSinceLastShot < SecondsBetweenShots) return;
-            
+
             SecondsSinceLastShot = 0;
             OnShoot?.Invoke(new Bullet
             {
@@ -178,8 +182,5 @@ namespace Tanks.model
                 Firer = this
             });
         }
-
-        /// <inheritdoc />
-        public Shape CollisionContainer => Border;
     }
 }

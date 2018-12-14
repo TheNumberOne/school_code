@@ -30,7 +30,7 @@ namespace Tanks.utils
         }
 
         /// <summary>
-        ///    Subtracts the coordinates of the second from the first.
+        ///     Subtracts the coordinates of the second from the first.
         /// </summary>
         public static PointF Minus(this PointF p1, PointF p2)
         {
@@ -56,7 +56,7 @@ namespace Tanks.utils
             );
         }
 
-        
+
         /// <summary>
         ///     Finds the distance between two points.
         /// </summary>
@@ -81,9 +81,9 @@ namespace Tanks.utils
         {
             return (p2.X - p1.X) * (p3.Y - p1.Y) - (p2.Y - p1.Y) * (p3.X - p1.X);
         }
-        
+
         /// <summary>
-        /// Returns the dot product of two points.
+        ///     Returns the dot product of two points.
         /// </summary>
         public static float Dot(this PointF p1, PointF p2)
         {
