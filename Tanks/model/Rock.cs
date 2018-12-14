@@ -1,26 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+﻿using System.Drawing;
 using Tanks.utils;
 
 namespace Tanks.model
 {
-    public class Rock
+    /// <inheritdoc />
+    /// <summary>
+    ///     Represents a rock in the game.
+    /// </summary>
+    public class Rock: ICollidable
     {
-        private const int NumBorderPoints = 20;
-        private const float RockGenerationAngleDelta = (float) (2 * Math.PI / NumBorderPoints);
+        /// <summary>
+        ///     Used to cache the border. Useful for decreasing slow game speeds.
+        /// </summary>
+        private Shape _borderCache;
+        private PointF _borderCacheCenter;
 
-        private Shape _border;
-        private PointF _currentBorderCenter;
+        public PointF Location;
 
-        public PointF Center;
-
-        public Rock(PointF center, Random r, float minRadius, float maxRadius)
+        public Rock(PointF location, Shape prototype)
         {
-            Center = center;
-
-            Prototype = Smooth(RandomRock(r, minRadius, maxRadius)).ToArray();
+            Location = location;
+            Prototype = prototype;
         }
 
         private Shape Prototype { get; }
@@ -29,48 +29,15 @@ namespace Tanks.model
         {
             get
             {
-                if (Center != _currentBorderCenter) _border = null;
+                // Reset the cache if the location has changed.
+                if (Location != _borderCacheCenter) _borderCache = null;
 
-                _currentBorderCenter = Center;
-                return _border ?? (_border = Prototype.Transform(p => p.Plus(Center)));
+                _borderCacheCenter = Location;
+                return _borderCache ?? (_borderCache = Prototype.Transform(p => p.Plus(Location)));
             }
         }
-
-        private static IEnumerable<PointF> RandomRock(Random rand, float minRadius, float maxRadius)
-        {
-            for (float theta = 0; theta < 2 * Math.PI; theta += RockGenerationAngleDelta)
-            {
-                var r = (float) (rand.NextDouble() * (maxRadius - minRadius) + minRadius);
-                yield return new PointF(r, 0).Rotate(theta);
-            }
-        }
-
-        private static IEnumerable<PointF> Smooth(IEnumerable<PointF> points)
-        {
-            using (var iter = points.GetEnumerator())
-            {
-                if (!iter.MoveNext()) yield break;
-
-                var first = iter.Current;
-
-                if (!iter.MoveNext())
-                {
-                    yield return first;
-                    yield break;
-                }
-
-                var last = iter.Current;
-
-                yield return Utils.Average(first, last);
-
-                do
-                {
-                    yield return Utils.Average(last, iter.Current);
-                    last = iter.Current;
-                } while (iter.MoveNext());
-
-                yield return Utils.Average(last, first);
-            }
-        }
+        
+        /// <inheritdoc />
+        public Shape CollisionContainer => Border;
     }
 }

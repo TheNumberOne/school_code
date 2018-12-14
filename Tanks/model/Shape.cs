@@ -6,6 +6,10 @@ using Tanks.utils;
 
 namespace Tanks.model
 {
+    /// <summary>
+    ///     This is a shape used mainly for collision detection. Has the unique property that it will easily convert
+    ///     back and forth between an array of points.
+    /// </summary>
     public class Shape
     {
         private Shape(IEnumerable<PointF> points) : this(points.ToArray())
@@ -15,78 +19,53 @@ namespace Tanks.model
         private Shape(PointF[] points)
         {
             Points = points;
-            Edges = new Edge[points.Length];
-
-            for (var i = 0; i < points.Length; i++)
-                Edges[i] = new Edge
-                {
-                    P1 = points[i],
-                    P2 = points[i + 1 == points.Length ? 0 : i + 1]
-                };
+            Edges = Edge.EdgesFrom(points);
         }
 
         private PointF[] Points { get; }
 
         private Edge[] Edges { get; }
 
+        /// <summary>
+        ///     Transforms every point in the shape by the function.
+        /// </summary>
         public Shape Transform(Func<PointF, PointF> t)
         {
             return new Shape(Points.Select(t));
         }
 
+        /// <summary>
+        ///     Allows automatic conversion of a shape to an array of points.
+        /// </summary>
         public static implicit operator PointF[](Shape s)
         {
             return s.Points;
         }
 
+        /// <summary>
+        ///     Allows automatic conversion of an array of points to a shape.
+        /// </summary>
+        /// <param name="ps"></param>
+        /// <returns></returns>
         public static implicit operator Shape(PointF[] ps)
         {
             return new Shape(ps);
         }
 
+        /// <summary>
+        ///     Determines if there's a collision between two shapes.
+        /// </summary>
         public bool IsCollision(Shape other)
         {
-            // Basic bounds check.
-            if (MaxX() < other.MinX() ||
-                other.MaxX() < MinX() ||
-                MaxY() < other.MinY() ||
-                other.MaxY() < MinY())
-                return false;
-
-            return Edges.Any(e1 => other.Edges.Any(e1.IsCollision));
+            return CheckBoundingBoxCollision(other) && Edges.Any(e1 => other.Edges.Any(e1.IsCollision));
         }
 
-        public bool ContainsPoint(PointF p)
+        /// <summary>
+        ///     Checks if the bounding boxed between two shapes collides.
+        /// </summary>
+        private bool CheckBoundingBoxCollision(Shape other)
         {
-            if (MaxX() < p.X ||
-                p.X < MinX() ||
-                MaxY() < p.Y ||
-                p.Y < MinY())
-                return false;
-
-            var numIntersect = (from edge in Edges
-                let p1Above = edge.P1.Y > p.Y
-                let p2Above = edge.P2.Y > p.Y
-                where p1Above != p2Above
-                let clockwise = Utils.SignedTriangleArea(edge.P1, p, edge.P2) < 0
-                where clockwise != p1Above
-                select p1Above).Count();
-
-            return numIntersect % 2 == 1;
-        }
-
-        public PointF Center()
-        {
-            return new PointF(
-                Points.Average(p => p.X),
-                Points.Average(p => p.Y)
-            );
-        }
-
-        public float MaxRadius()
-        {
-            var c = Center();
-            return Points.Max(p => p.Distance(c));
+            return !(MaxX() < other.MinX() || other.MaxX() < MinX() || MaxY() < other.MinY() || other.MaxY() < MinY());
         }
 
         private float MinX()
@@ -110,21 +89,50 @@ namespace Tanks.model
         }
     }
 
+    /// <summary>
+    ///     A simple object to help assist shapes in collision detection.
+    /// </summary>
     internal class Edge
     {
-        public PointF P1 { get; set; }
-        public PointF P2 { get; set; }
+        private PointF P1 { get; }
+        private PointF P2 { get; }
 
+        private Edge(PointF p1, PointF p2)
+        {
+            P1 = p1;
+            P2 = p2;
+        }
+
+        /// <summary>
+        ///     Determines if there's a collision between the two edges.
+        /// </summary>
         public bool IsCollision(Edge other)
         {
+            // I don't remember where I got this formula from :(
             var a1 = Utils.SignedTriangleArea(P1, P2, other.P2);
             var a2 = Utils.SignedTriangleArea(P1, P2, other.P1);
             if (a1 * a2 >= 0) return false;
             var a3 = Utils.SignedTriangleArea(other.P1, other.P2, P1);
+            
             //float a4 = Utils.SignedTriangleArea(other.P1, other.P2, P2);
             var a4 = a3 + a2 - a1;
 
             return a3 * a4 < 0;
+        }
+
+        /// <summary>
+        ///     Returns a list of edges from the specified points.
+        /// </summary>
+        public static Edge[] EdgesFrom(IReadOnlyList<PointF> points)
+        {
+            var edges = new Edge[points.Count];
+
+            for (var i = 0; i < points.Count; i++)
+                edges[i] = new Edge(
+                    points[i],
+                    points[i + 1 == points.Count ? 0 : i + 1] // wrap around to front
+                );
+            return edges;
         }
     }
 }

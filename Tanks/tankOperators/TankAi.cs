@@ -4,21 +4,21 @@ using Tanks.utils;
 
 namespace Tanks.tankOperators
 {
-    public class TankAi
+    /// <inheritdoc />
+    /// <summary>
+    ///     A simple ai for our enemy tanks.
+    /// </summary>
+    public class TankAi: IUpdateable
     {
         public Tank Tank { get; set; }
         public Game Game { get; set; }
 
+        /// <inheritdoc />
         public void Update(TimeSpan deltaT)
         {
-            if (Utils.SignedTriangleArea(Tank.Location, Tank.Gun, Game.Player.Location) > 0)
-            {
-                Tank.Rotation = Tank.RotationClockwise;
-            }
-            else
-            {
-                Tank.Rotation = Tank.RotationCounterclockwise;
-            }
+            Tank.Rotation = Utils.SignedTriangleArea(Tank.Location, Tank.Gun, Game.Player.Location) > 0
+                ? Tank.RotationClockwise
+                : Tank.RotationCounterclockwise;
 
             Tank.Movement = Tank.MoveForward;
             Tank.Shoot();

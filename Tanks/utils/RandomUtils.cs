@@ -5,17 +5,25 @@ namespace Tanks.utils
 {
     public static partial class Utils
     {
-        public static double Range(this Random r, double min, double max)
-        {
-            return r.NextDouble() * (max - min) + min;
-        }
+        /// <summary>
+        ///     Returns a random floating point number in the specified range.
+        /// </summary>
+        public static float RangeF(this Random r, float min, float max) => (float) r.NextDouble() * (max - min) + min;
 
+        /// <summary>
+        ///     Returns a random point in the specified rectangle.
+        /// </summary>
         public static PointF In(this Random r, RectangleF rect)
         {
             return new PointF(
-                (float) r.Range(rect.Left, rect.Right),
-                (float) r.Range(rect.Top, rect.Bottom)
+                r.RangeF(rect.Left, rect.Right),
+                r.RangeF(rect.Top, rect.Bottom)
             );
         }
+
+        /// <summary>
+        ///     Returns a random angle.
+        /// </summary>
+        public static float RandomAngleF(this Random random) => random.RangeF(0, RadiansPerRotation);
     }
 }
