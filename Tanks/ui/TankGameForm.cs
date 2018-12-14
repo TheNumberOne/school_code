@@ -15,15 +15,17 @@ namespace Tanks.ui
         public TankGameForm()
         {
             SuspendLayout();
-            AutoScaleDimensions = new SizeF(6F, 13F); // Used so look is consistent across different screen densities.
+            AutoScaleDimensions = new SizeF(
+                width: 6F,
+                height: 13F
+            ); // Used so look is consistent across different screen densities.
             AutoScaleMode = AutoScaleMode.Font;
-            DoubleBuffered = true;
             Name = "Tanks";
             Text = "Tanks";
             WindowState = FormWindowState.Maximized;
 
             NavigateToMenu();
-            ResumeLayout(false);
+            ResumeLayout(performLayout: false);
         }
 
         private int? LastScore { get; set; }
@@ -36,7 +38,7 @@ namespace Tanks.ui
         {
             Controls.Clear();
 
-            var newGame = AddNewGameButton();
+            Button newGame = AddNewGameButton();
             DisplayBestScore(newGame);
             DisplayLastScore(newGame);
         }
@@ -48,12 +50,14 @@ namespace Tanks.ui
         private void DisplayLastScore(Control newGame)
         {
             if (LastScore != null)
-                Controls.Add(new Label
-                {
-                    Text = $"Last Score: {LastScore}",
-                    Anchor = AnchorStyles.None,
-                    Location = new Point(newGame.Location.X, newGame.Location.Y - LastScoreOffset)
-                });
+                Controls.Add(
+                    new Label
+                    {
+                        Text = $"Last Score: {LastScore}",
+                        Anchor = AnchorStyles.None,
+                        Location = new Point(newGame.Location.X, newGame.Location.Y - LastScoreOffset)
+                    }
+                );
         }
 
         /// <summary>
@@ -62,12 +66,14 @@ namespace Tanks.ui
         /// <param name="newGame">Used to position the best score.</param>
         private void DisplayBestScore(Control newGame)
         {
-            Controls.Add(new Label
-            {
-                Text = $"Best Score: {BestScore}",
-                Anchor = AnchorStyles.None,
-                Location = new Point(newGame.Location.X, newGame.Location.Y - BestScoreOffset)
-            });
+            Controls.Add(
+                new Label
+                {
+                    Text = $"Best Score: {BestScore}",
+                    Anchor = AnchorStyles.None,
+                    Location = new Point(newGame.Location.X, newGame.Location.Y - BestScoreOffset)
+                }
+            );
         }
 
         /// <summary>
@@ -76,11 +82,9 @@ namespace Tanks.ui
         /// <returns>The button so other controls can use it for positioning.</returns>
         private Button AddNewGameButton()
         {
-            var newGame = new Button
+            Button newGame = new Button
             {
-                Text = "Start New Game",
-                Anchor = AnchorStyles.None,
-                Size = new Size(112, 24)
+                Text = "Start New Game", Anchor = AnchorStyles.None, Size = new Size(width: 112, height: 24)
             };
 
             newGame.MouseClick += (_, __) => StartGame();
@@ -97,7 +101,7 @@ namespace Tanks.ui
         {
             Controls.Clear();
 
-            var tankForm = new GameControl {Dock = DockStyle.Fill, AutoSize = true};
+            GameControl tankForm = new GameControl {Dock = DockStyle.Fill, AutoSize = true};
             tankForm.OnGameEnd += game =>
             {
                 LastScore = game.Score;

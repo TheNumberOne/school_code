@@ -35,7 +35,8 @@ namespace Tanks.model
         private const int BulletLifeTime = 1;
 
 
-        public readonly float MaxRadius = (float) (Math.Sqrt(2) * Size); // sqrt 2 for long diagonal of square.
+        public readonly float MaxRadius = (float) (Math.Sqrt(d: 2) * Size); // sqrt 2 for long diagonal of square.
+        public const float MinRadius = Size;
 
         /// <summary>
         ///     Used to reset the tank's previous location if there is a collision.
@@ -57,16 +58,13 @@ namespace Tanks.model
         /// </summary>
         private static Shape ShapePrototype { get; } = new[]
         {
-            new PointF(-1, -1),
-            new PointF(1, -1),
-            new PointF(1, 1),
-            new PointF(-1, 1)
+            new PointF(x: -1, y: -1), new PointF(x: 1, y: -1), new PointF(x: 1, y: 1), new PointF(x: -1, y: 1)
         };
 
         /// <summary>
         ///     The location on the shape prototype that our gun is.
         /// </summary>
-        private static PointF GunPrototype { get; } = new PointF(1, 0);
+        private static PointF GunPrototype { get; } = new PointF(x: 1, y: 0);
 
         /// <summary>
         ///     The location that this tank's gun is at.
@@ -112,7 +110,7 @@ namespace Tanks.model
         /// <inheritdoc />
         public void Update(TimeSpan delta)
         {
-            var dt = delta.TotalSecondsF();
+            float dt = delta.TotalSecondsF();
             _previousLocation = Location;
             PreviousAngle = Angle;
 
@@ -122,13 +120,16 @@ namespace Tanks.model
             SecondsSinceLastShot += dt;
         }
 
+
+        /// <summary>
+        ///     Returns the future location of this missile assuming it doesn't accelerate.
+        /// </summary>
+        public PointF FutureLocation(float t) => Location.Plus(Velocity.Times(t));
+
         /// <summary>
         ///     Transforms the prototype points for our shape and gun to their actual locations.
         /// </summary>
-        private PointF TransformPrototype(PointF p)
-        {
-            return p.Rotate(Angle).Times(Size).Plus(Location);
-        }
+        private PointF TransformPrototype(PointF p) => p.Rotate(Angle).Times(Size).Plus(Location);
 
         /// <summary>
         ///     Undoes the last update, but only undoing the changes in location and angle.
@@ -155,14 +156,16 @@ namespace Tanks.model
         public void FireMissile()
         {
             // Currently not rate limited so this could be spammed pretty bad.
-            OnFireMissile?.Invoke(new Missile
-            {
-                Location = Location,
-                Velocity = Utils.PolarToPointF(Angle, BulletSpeed),
-                Angle = Angle,
-                Firer = this,
-                Target = MissileTarget
-            });
+            OnFireMissile?.Invoke(
+                new Missile
+                {
+                    Location = Location,
+                    Velocity = Utils.PolarToPointF(Angle, BulletSpeed),
+                    Angle = Angle,
+                    Firer = this,
+                    Target = MissileTarget
+                }
+            );
         }
 
         /// <summary>
@@ -174,13 +177,15 @@ namespace Tanks.model
             if (SecondsSinceLastShot < SecondsBetweenShots) return;
 
             SecondsSinceLastShot = 0;
-            OnShoot?.Invoke(new Bullet
-            {
-                Location = Gun,
-                Velocity = Utils.PolarToPointF(Angle, BulletSpeed),
-                LifeTime = BulletLifeTime,
-                Firer = this
-            });
+            OnShoot?.Invoke(
+                new Bullet
+                {
+                    Location = Gun,
+                    Velocity = Utils.PolarToPointF(Angle, BulletSpeed),
+                    LifeTime = BulletLifeTime,
+                    Firer = this
+                }
+            );
         }
     }
 }

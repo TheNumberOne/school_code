@@ -11,17 +11,12 @@ namespace Tanks.utils
         ///     Get the total seconds of this timespan in single precision floating point.
         ///     (Mainly so we don't have to cast stuff everywhere.
         /// </summary>
-        public static float TotalSecondsF(this TimeSpan deltaT)
-        {
-            return (float) deltaT.TotalSeconds;
-        }
+        public static float TotalSecondsF(this TimeSpan deltaT) => (float) deltaT.TotalSeconds;
 
         /// <summary>
         ///     Helper method for determining if there is a collision between two collidable objects.
         /// </summary>
-        public static bool IsCollision(this ICollidable c1, ICollidable c2)
-        {
-            return c1.CollisionContainer.IsCollision(c2.CollisionContainer);
-        }
+        public static bool IsCollision(this ICollidable c1, ICollidable c2) =>
+            c1.CollisionContainer.IsCollision(c2.CollisionContainer);
     }
 }

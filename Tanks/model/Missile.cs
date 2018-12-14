@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using MathNet.Numerics;
 using Tanks.utils;
 
@@ -55,55 +56,55 @@ namespace Tanks.model
         /// <summary>
         ///     Calculates the current thrust.
         /// </summary>
-        private PointF CalculateThrust()
-        {
-            return new PointF(MissileAcceleration, 0).Rotate(Angle);
-        }
+        private PointF CalculateThrust() => Utils.PolarToPointF(Angle, MissileAcceleration);
 
         /// <summary>
         ///     Aims the missile to point at the best place.
         /// </summary>
         private void Aim()
         {
-            var t = DetermineTimeToCollision();
+            float t = DetermineTimeToCollision();
 
-            var futureLocation = FutureLocation(t);
-            Angle = (float) Math.Atan2(Target.Location.Y - futureLocation.Y, Target.Location.X - futureLocation.X);
+            PointF futureLocation = FutureLocation(t);
+            PointF targetFutureLocation = Target.FutureLocation(t);
+            Angle = (float) Math.Atan2(
+                targetFutureLocation.Y - futureLocation.Y,
+                targetFutureLocation.X - futureLocation.X
+            );
         }
 
         /// <summary>
         ///     Returns the future location of this missile assuming it doesn't accelerate.
         /// </summary>
-        private PointF FutureLocation(float t)
-        {
-            return Location.Plus(Velocity.Times(t));
-        }
+        private PointF FutureLocation(float t) => Location.Plus(Velocity.Times(t));
 
         /// <summary>
         ///     Estimates time to collision assuming that this missile is aimed perfectly.
         /// </summary>
         private float DetermineTimeToCollision()
         {
-            var location = Location.Minus(Target.Location);
+            PointF location = Location.Minus(Target.Location);
+            PointF velocity = Velocity.Minus(Target.Velocity);
 
             // Derived by hand.
-            // ||p+vt|| is the distance to the origin at time t assuming a straight line.
-            // at^2/2 is the distance it's possible to travel through acceleration
-            // so we want to look for where they are equal: 
-            // ||p+vt|| = at^2/2
-            // (p+vt).(p+vt) = a^2t^4/4
-            // (a^2/4)t^4 - (v.v)t^2 - 2(p.v)t - p.p = 0
-            var poly = new Polynomial(
-                -location.Dot(location), // -p.p
-                -2 * location.Dot(Velocity), // -2p.v
-                -Velocity.Dot(Velocity), // -v.v
+            // Basically, assuming both objects don't accelerate, find the lowest time t where the distance between the
+            // this missile and its target is equal to the max amount you can accelerate in that time plus the radius of
+            // the target.
+            //
+            // That can be expressed as the smallest positive real solution of the following equation:
+            // distance(Location + Velocity * t, Target.Location + Target.Velocity * t) = MissileAcceleration/2 * t^2 + Target.MinRadius
+            // which can be simplified to the smallest positive real root of the following quartic polynomial
+            Polynomial poly = new Polynomial(
+                Tank.MinRadius * Tank.MinRadius - location.Dot(location),
+                -2 * location.Dot(velocity),
+                MissileAcceleration * Tank.MinRadius - velocity.Dot(velocity),
                 0,
-                MissileAcceleration * MissileAcceleration / 4 // a^2 / 4
+                MissileAcceleration * MissileAcceleration / 4
             );
 
-            var roots = poly.Roots();
+            Complex[] roots = poly.Roots();
 
-            var t = roots.Where(it => it.IsRealNonNegative()).Min(it => it.Real);
+            double t = roots.Where(it => it.IsRealNonNegative()).Min(it => it.Real);
             return (float) t;
         }
     }

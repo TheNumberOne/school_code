@@ -86,12 +86,12 @@ namespace Tanks.model
         ///     A collection of everything that can be updated in this.
         /// </summary>
         private IEnumerable<IUpdateable> AllUpdatables =>
-            EnemyAis.AsEnumerable<IUpdateable>().Concat(Tanks).Concat(Bullets).Concat(Missiles);
+            EnemyAis.AsEnumerable<IUpdateable>().Concat(Missiles).Concat(Tanks).Concat(Bullets);
 
         /// <inheritdoc />
         public void Update(TimeSpan deltaT)
         {
-            foreach (var u in AllUpdatables) u.Update(deltaT);
+            foreach (IUpdateable u in AllUpdatables) u.Update(deltaT);
 
             HandleCollisions(deltaT);
             RemoveDeadStuff();
@@ -106,11 +106,7 @@ namespace Tanks.model
         /// </summary>
         private void CreatePlayer()
         {
-            var tank = new Tank
-            {
-                Angle = Random.RandomAngleF(),
-                SecondsBetweenShots = SecondsBetweenPlayerShots
-            };
+            Tank tank = new Tank {Angle = Random.RandomAngleF(), SecondsBetweenShots = SecondsBetweenPlayerShots};
             tank.OnShoot += Bullets.Add;
             tank.OnFireMissile += Missiles.Add;
 
@@ -124,10 +120,7 @@ namespace Tanks.model
         /// <param name="tank"></param>
         private void PlacePlayer(Tank tank)
         {
-            do
-            {
-                tank.Location = Random.In(Bounds);
-            } while (IsCollidedWithRocks(tank));
+            do { tank.Location = Random.In(Bounds); } while (IsCollidedWithRocks(tank));
         }
 
         /// <summary>
@@ -143,7 +136,7 @@ namespace Tanks.model
         /// </summary>
         private void AddEnemy()
         {
-            var enemy = GenerateRandomEnemyTank();
+            Tank enemy = GenerateRandomEnemyTank();
             EnemyAis.Add(new TankAi {Tank = enemy, Game = this});
             Enemies.Add(enemy);
         }
@@ -153,11 +146,11 @@ namespace Tanks.model
         /// </summary>
         private Tank GenerateRandomEnemyTank()
         {
-            var tank = new Tank
+            Tank tank = new Tank
             {
                 Angle = Random.RandomAngleF(),
                 SecondsBetweenShots = SecondsBetweenEnemyShots,
-                SecondsSinceLastShot = Random.RangeF(0, SecondsBetweenEnemyShots)
+                SecondsSinceLastShot = Random.RangeF(min: 0, max: SecondsBetweenEnemyShots)
             };
 
             tank.OnShoot += Bullets.Add;
@@ -172,20 +165,15 @@ namespace Tanks.model
         /// </summary>
         private void PlaceEnemyTank(Tank tank)
         {
-            do
-            {
-                tank.Location = Random.In(Bounds);
-            } while (IsCollidedWithRocks(tank) || IsNearPlayer(tank));
+            do { tank.Location = Random.In(Bounds); } while (IsCollidedWithRocks(tank) || IsNearPlayer(tank));
         }
 
         /// <summary>
         ///     Determines if the given tank is near the player.
         /// </summary>
-        private bool IsNearPlayer(Tank tank)
-        {
-            return Math.Abs(tank.Location.X - Player.Location.X) < Bounds.Width / 4
-                   && Math.Abs(tank.Location.Y - Player.Location.Y) < Bounds.Height / 4;
-        }
+        private bool IsNearPlayer(Tank tank) =>
+            Math.Abs(tank.Location.X    - Player.Location.X) < Bounds.Width  / 4
+            && Math.Abs(tank.Location.Y - Player.Location.Y) < Bounds.Height / 4;
 
         /// <summary>
         ///     Removes all objects that are determined to be dead except for the player.
@@ -226,9 +214,9 @@ namespace Tanks.model
         /// </summary>
         private void HandleTankMissileCollisions()
         {
-            foreach (var missile in Missiles)
+            foreach (Missile missile in Missiles)
             {
-                var target = missile.Target;
+                Tank target = missile.Target;
                 if (!target.Alive) continue;
 
                 if (!target.IsCollision(missile)) continue;
@@ -251,9 +239,10 @@ namespace Tanks.model
         /// </summary>
         private void HandleBulletRockCollisions()
         {
-            foreach (var bullet in Bullets)
-                if (Rocks.Any(r => r.IsCollision(bullet)))
-                    bullet.LifeTime = 0;
+            foreach (Bullet bullet in Bullets)
+            {
+                if (Rocks.Any(r => r.IsCollision(bullet))) bullet.LifeTime = 0;
+            }
         }
 
         /// <summary>
@@ -261,8 +250,8 @@ namespace Tanks.model
         /// </summary>
         private void HandleTankBulletCollisions()
         {
-            foreach (var tank in Tanks)
-            foreach (var bullet in Bullets)
+            foreach (Tank tank in Tanks)
+            foreach (Bullet bullet in Bullets)
             {
                 if (bullet.Firer == tank) continue;
                 if (!bullet.IsCollision(tank)) continue;
@@ -279,12 +268,12 @@ namespace Tanks.model
         /// </summary>
         private void HandleTankTankCollisions(TimeSpan deltaT)
         {
-            var tanks = Tanks.ToList();
-            for (var i = 0; i < tanks.Count; i++)
-            for (var j = i + 1; j < tanks.Count; j++)
+            List<Tank> tanks = Tanks.ToList();
+            for (int i = 0; i < tanks.Count; i++)
+            for (int j = i + 1; j < tanks.Count; j++)
             {
-                var t1 = tanks[i];
-                var t2 = tanks[j];
+                Tank t1 = tanks[i];
+                Tank t2 = tanks[j];
 
                 if (!t1.IsCollision(t2)) continue;
 
@@ -309,7 +298,7 @@ namespace Tanks.model
         /// <param name="deltaT"></param>
         private void HandleTankRockCollisions(TimeSpan deltaT)
         {
-            foreach (var tank in Tanks)
+            foreach (Tank tank in Tanks)
             {
                 if (!Rocks.Any(rock => rock.IsCollision(tank))) continue;
 
@@ -321,20 +310,17 @@ namespace Tanks.model
         /// <summary>
         ///     Checks to see if the object is colliding with any rocks.
         /// </summary>
-        private bool IsCollidedWithRocks(ICollidable t)
-        {
-            return Rocks.Any(rock => rock.IsCollision(t));
-        }
+        private bool IsCollidedWithRocks(ICollidable t) { return Rocks.Any(rock => rock.IsCollision(t)); }
 
         /// <summary>
         ///     Wraps the centers of everything.
         /// </summary>
         private void WrapStuff()
         {
-            foreach (var r in Rocks) WrapPoint(ref r.Location);
-            foreach (var b in Bullets) WrapPoint(ref b.Location);
-            foreach (var tank in Enemies) WrapPoint(ref tank.Location);
-            foreach (var missile in Missiles) WrapPoint(ref missile.Location);
+            foreach (Rock r in Rocks) WrapPoint(ref r.Location);
+            foreach (Bullet b in Bullets) WrapPoint(ref b.Location);
+            foreach (Tank tank in Enemies) WrapPoint(ref tank.Location);
+            foreach (Missile missile in Missiles) WrapPoint(ref missile.Location);
         }
 
         /// <summary>
@@ -353,17 +339,14 @@ namespace Tanks.model
         /// </summary>
         private void CenterPlayer()
         {
-            var deltaP = Player.Location.Times(-1);
+            PointF deltaP = Player.Location.Times(r: -1);
 
-            void Transform(ref PointF p)
-            {
-                p = p.Plus(deltaP);
-            }
+            void Transform(ref PointF p) { p = p.Plus(deltaP); }
 
-            foreach (var rock in Rocks) Transform(ref rock.Location);
-            foreach (var b in Bullets) Transform(ref b.Location);
-            foreach (var tank in Tanks) Transform(ref tank.Location);
-            foreach (var missile in Missiles) Transform(ref missile.Location);
+            foreach (Rock rock in Rocks) Transform(ref rock.Location);
+            foreach (Bullet b in Bullets) Transform(ref b.Location);
+            foreach (Tank tank in Tanks) Transform(ref tank.Location);
+            foreach (Missile missile in Missiles) Transform(ref missile.Location);
         }
     }
 }

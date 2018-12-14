@@ -24,7 +24,7 @@ namespace Tanks.model
         /// <inheritdoc />
         public void Update(TimeSpan t)
         {
-            var time = (float) Math.Min(LifeTime, t.TotalSeconds);
+            float time = (float) Math.Min(LifeTime, t.TotalSeconds);
             _previousLocation = Location;
             Location = Location.Plus(Velocity.Times(time));
             LifeTime -= time;

@@ -24,10 +24,7 @@ namespace Tanks.model
         private const int NumBorderPoints = 20;
 
 
-        public RandomRockFactory(Random random)
-        {
-            Random = random;
-        }
+        public RandomRockFactory(Random random) { Random = random; }
 
         private Random Random { get; }
 
@@ -38,15 +35,15 @@ namespace Tanks.model
         /// <returns></returns>
         public IEnumerable<Rock> GenerateRocks(RectangleF rect)
         {
-            var numRocks = (int) Math.Round(RockDensity * rect.Width * rect.Height);
-            for (var i = 0; i < numRocks; i++)
+            int numRocks = (int) Math.Round(RockDensity * rect.Width * rect.Height);
+            for (int i = 0; i < numRocks; i++)
             {
-                var coord = Random.In(rect);
-                var minRadius = Random.RangeF(MinMinRockRadius, MaxMinRockRadius);
-                var maxRadiusMultiple = Random.RangeF(MinMaxRadiusMultiple, MaxMaxRadiusMultiple);
-                var maxRadius = minRadius * maxRadiusMultiple;
+                PointF coord = Random.In(rect);
+                float minRadius = Random.RangeF(MinMinRockRadius, MaxMinRockRadius);
+                float maxRadiusMultiple = Random.RangeF(MinMaxRadiusMultiple, MaxMaxRadiusMultiple);
+                float maxRadius = minRadius * maxRadiusMultiple;
 
-                var rockBorder = Smooth(RandomizedCircle(minRadius, maxRadius)).ToArray();
+                PointF[] rockBorder = Smooth(RandomizedCircle(minRadius, maxRadius)).ToArray();
                 yield return new Rock(coord, rockBorder);
             }
         }
@@ -58,7 +55,7 @@ namespace Tanks.model
         {
             for (float theta = 0; theta < Utils.RadiansPerRotation; theta += RockGenerationAngleDelta)
             {
-                var r = Random.RangeF(minRadius, maxRadius);
+                float r = Random.RangeF(minRadius, maxRadius);
                 yield return Utils.PolarToPointF(theta, r);
             }
         }
@@ -68,12 +65,12 @@ namespace Tanks.model
         /// </summary>
         private static IEnumerable<PointF> Smooth(IEnumerable<PointF> points)
         {
-            using (var iter = points.GetEnumerator())
+            using (IEnumerator<PointF> iter = points.GetEnumerator())
             {
                 // Return nothing if there are no points.
                 if (!iter.MoveNext()) yield break;
 
-                var first = iter.Current;
+                PointF first = iter.Current;
 
                 // Return only the first point if there's only one point.
                 if (!iter.MoveNext())
@@ -82,7 +79,7 @@ namespace Tanks.model
                     yield break;
                 }
 
-                var last = first;
+                PointF last = first;
 
                 // Average each pair.
                 do

@@ -28,7 +28,7 @@ namespace Tanks.ui
         /// <summary>
         ///     The default size of the game.
         /// </summary>
-        private static readonly RectangleF GameSize = new RectangleF(-1500, -750, 3000, 1500);
+        private static readonly RectangleF GameSize = new RectangleF(x: -1500, y: -750, width: 3000, height: 1500);
 
         /// <summary>
         ///     Constructs a new game control.
@@ -36,8 +36,8 @@ namespace Tanks.ui
         public GameControl()
         {
             DoubleBuffered = true;
-            AddEventHandlers();
             Game = new Game(GameSize);
+            AddEventHandlers();
         }
 
         /// <summary>
@@ -69,10 +69,7 @@ namespace Tanks.ui
         /// <summary>
         ///     Fire a missile when the mouse is clicked.
         /// </summary>
-        private void Tanks_OnMouseDown()
-        {
-            Game.Player.FireMissile();
-        }
+        private void Tanks_OnMouseDown() { Game.Player.FireMissile(); }
 
         /// <summary>
         ///     The event fired when the game ends.
@@ -82,10 +79,7 @@ namespace Tanks.ui
         /// <summary>
         ///     Determines if the specified key is pressed or not.
         /// </summary>
-        private bool Pressed(Keys k)
-        {
-            return KeysPressed.Contains(k);
-        }
+        private bool Pressed(Keys k) => KeysPressed.Contains(k);
 
         /// <summary>
         ///     Updates the game and paints.
@@ -94,7 +88,7 @@ namespace Tanks.ui
         {
             UpdateGame();
 
-            var g = e.Graphics;
+            Graphics g = e.Graphics;
             g.TranslateTransform(e.ClipRectangle.Width / 2.0f, e.ClipRectangle.Height / 2.0f);
             g.SmoothingMode = SmoothingMode.AntiAlias;
             GameDisplayer.Display(Game, g);
@@ -107,8 +101,8 @@ namespace Tanks.ui
         {
             if (Game.IsOver) return;
 
-            var now = DateTime.Now;
-            var deltaT = now - LastTime;
+            DateTime now = DateTime.Now;
+            TimeSpan deltaT = now - LastTime;
             LastTime = now;
 
             if (Pressed(FireKey)) Game.Player.Shoot();
@@ -125,8 +119,11 @@ namespace Tanks.ui
         /// </summary>
         private void SelectPlayerMissileTarget()
         {
-            Game.Player.MissileTarget = Game.Enemies.MinBy(t =>
-                t.Location.Distance(ClientToGameCoordinates(PointToClient(Cursor.Position)))).First();
+            Game.Player.MissileTarget = Game.Enemies.MinBy(
+                    t =>
+                        t.Location.Distance(ClientToGameCoordinates(PointToClient(Cursor.Position)))
+                )
+                .First();
         }
 
         /// <summary>
@@ -135,9 +132,9 @@ namespace Tanks.ui
         private PointF ClientToGameCoordinates(PointF screen)
         {
             PointF center = ClientRectangle.Location;
-            center.X += ClientRectangle.Width / 2f;
+            center.X += ClientRectangle.Width  / 2f;
             center.Y += ClientRectangle.Height / 2f;
-            return screen.Plus(center.Times(-1));
+            return screen.Minus(center);
         }
 
         /// <summary>
@@ -156,7 +153,7 @@ namespace Tanks.ui
         {
             // Switch not used because of weird flags behavior.
             if (k == CounterClockwiseKey || k == ClockwiseKey) UpdateRotation();
-            if (k == ForwardKey || k == BackwardsKey) UpdateMovement();
+            if (k == ForwardKey          || k == BackwardsKey) UpdateMovement();
         }
 
         /// <summary>
@@ -208,10 +205,8 @@ namespace Tanks.ui
                 case BackwardsKey:
                 case ClockwiseKey:
                 case CounterClockwiseKey:
-                case FireKey:
-                    return true;
-                default:
-                    return base.IsInputKey(keyData);
+                case FireKey: return true;
+                default: return base.IsInputKey(keyData);
             }
         }
     }
