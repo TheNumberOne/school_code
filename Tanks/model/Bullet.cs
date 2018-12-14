@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Drawing;
-using Tanks.model;
 using Tanks.utils;
 
-namespace Tanks
+namespace Tanks.model
 {
     /// <summary>
     ///     This represents a bullet shot by one of the tanks.
     /// </summary>
-    public class Bullet
+    public class Bullet : IUpdateable
     {
-        public Tank Firer { get; set; }
         public PointF Location;
         public PointF PreviousLocation;
         public PointF Velocity;
+        public Tank Firer { get; set; }
         public double LifeTime { get; set; }
         public bool Alive => LifeTime > 0;
 
@@ -28,21 +27,6 @@ namespace Tanks
         public Shape GetMovementLine()
         {
             return new[] {PreviousLocation, Location};
-        }
-
-        public bool CheckCollision(Missile missile)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CheckCollision(Rock missile)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CheckCollision(Tank missile)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -3,7 +3,7 @@ using Tanks.model;
 
 namespace Tanks.tankOperators
 {
-    public class MissileAI : ITankOperator
+    public class MissileAi : TankAi
     {
         public void Update(Tank tank, Game game)
         {

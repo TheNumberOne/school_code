@@ -11,18 +11,16 @@ namespace Tanks.ui
 {
     public sealed class GameControl : Control
     {
-        private static readonly RectangleF GameSize = new RectangleF(-1500, -750, 3000, 1500);
+        public delegate void OnGameEndEvent(Game g);
 
         private const Keys ForwardKey = Keys.W;
         private const Keys BackwardsKey = Keys.S;
         private const Keys CounterClockwiseKey = Keys.A;
         private const Keys ClockwiseKey = Keys.D;
         private const Keys FireKey = Keys.Space;
-        
-        
-        private const float BulletRate = 10;
-        private static readonly TimeSpan BulletInterval = TimeSpan.FromSeconds(1 / BulletRate);
-        private DateTime LastBulletFired { get; set; }= DateTime.MinValue;
+
+
+        private static readonly RectangleF GameSize = new RectangleF(-1500, -750, 3000, 1500);
 
 
         public GameControl()
@@ -30,23 +28,23 @@ namespace Tanks.ui
             KeyDown += (_, e) => Tanks_OnKeyDown(e);
             Paint += (_, e) => Tanks_OnPaint(e);
             KeyUp += (_, e) => Tanks_OnKeyUp(e);
-            MouseDown += (_, e) => Tanks_OnMouseDown(e);
+            MouseDown += (_, e) => Tanks_OnMouseDown();
             DoubleBuffered = true;
             Game = new Game(GameSize);
         }
 
-        private void Tanks_OnMouseDown(MouseEventArgs e)
-        {
-            Game.Player.FireMissile();
-        }
-
-        public delegate void OnGameEndEvent();
-
-        public event OnGameEndEvent OnGameEnd;
+        private DateTime LastBulletFired { get; set; } = DateTime.MinValue;
 
         private Game Game { get; }
         private HashSet<Keys> KeysPressed { get; } = new HashSet<Keys>();
         private DateTime LastTime { get; set; } = DateTime.Now;
+
+        private void Tanks_OnMouseDown()
+        {
+            Game.Player.FireMissile();
+        }
+
+        public event OnGameEndEvent OnGameEnd;
 
         private bool Pressed(Keys k)
         {
@@ -60,21 +58,16 @@ namespace Tanks.ui
                 var now = DateTime.Now;
                 var deltaT = now - LastTime;
                 
-                if (Pressed(FireKey) && now - LastBulletFired >= BulletInterval)
-                {
-                    LastBulletFired = now;
-                    Game.Player.Shoot();
-                }
+                if (Pressed(FireKey)) Game.Player.Shoot();
                 
                 Game.Update(deltaT);
                 LastTime = now;
 
-                if (Game.IsOver) OnGameEnd?.Invoke();
+                if (Game.IsOver) OnGameEnd?.Invoke(Game);
                 
-//                Console.WriteLine(e.ClipRectangle);
+                Game.Player.MissileTarget = Game.Enemies.MinBy(t =>
+                    t.Location.Distance(ClientToGameCoordinates(PointToClient(Cursor.Position)))).First();
 
-                Game.Player.MissileTarget = Game.Enemies.MinBy(t => t.Location.Distance(ClientToGameCoordinates(PointToClient(Cursor.Position)))).First();
-                
                 Invalidate();
             }
 
@@ -86,7 +79,6 @@ namespace Tanks.ui
 
         private PointF ClientToGameCoordinates(PointF screen)
         {
-//            Console.WriteLine(this.);
             PointF center = ClientRectangle.Location;
             center.X += ClientRectangle.Width / 2f;
             center.Y += ClientRectangle.Height / 2f;
@@ -124,7 +116,8 @@ namespace Tanks.ui
                 return;
             }
 
-            Game.Player.Rotation = Pressed(CounterClockwiseKey) ? Tank.RotationCounterclockwise : Tank.RotationClockwise;
+            Game.Player.Rotation =
+                Pressed(CounterClockwiseKey) ? Tank.RotationCounterclockwise : Tank.RotationClockwise;
         }
 
         private void Tanks_OnKeyUp(KeyEventArgs e)

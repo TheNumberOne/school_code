@@ -6,6 +6,10 @@ namespace Tanks.model
 {
     public class Tank
     {
+        public delegate void OnFireMissileEventHandler(Missile missile);
+
+        public delegate void OnShootEventHandler(Bullet bullet);
+
         public const float RotationNone = 0;
         public const float RotationClockwise = 1;
         public const float RotationCounterclockwise = -RotationClockwise;
@@ -17,16 +21,19 @@ namespace Tanks.model
 
         private const float StartLife = 10;
         private const float Size = 10;
+
+        public float SecondsBetweenShots { get; set; } = 10;
+        public float SecondsSinceLastShot { get; set; } = 0;
+
+
+        public readonly float MaxRadius = (float) (Math.Sqrt(2) * Size);
         private PointF _previousLocation;
         public PointF Location;
 
         public Tank MissileTarget { get; set; }
 
-
-        public readonly float MaxRadius = (float) (Math.Sqrt(2) * Size);
-        
         private static PointF StartingBulletVelocity { get; } = new PointF(BulletSpeed, 0);
-        
+
         private static Shape ShapePrototype { get; } = new[]
         {
             new PointF(-1, -1),
@@ -59,10 +66,11 @@ namespace Tanks.model
             var dt = delta.TotalSeconds;
             _previousLocation = Location;
             PreviousAngle = Angle;
-            
+
             Location.X += (float) (Movement * Math.Cos(Angle) * dt);
             Location.Y += (float) (Movement * Math.Sin(Angle) * dt);
             Angle += (float) (Rotation * dt);
+            SecondsSinceLastShot += (float) dt;
         }
 
         public void UndoUpdate()
@@ -70,10 +78,6 @@ namespace Tanks.model
             Location = _previousLocation;
             Angle = PreviousAngle;
         }
-        
-        public delegate void OnShootEventHandler(Bullet bullet);
-
-        public delegate void OnFireMissileEventHandler(Missile missile);
 
         public event OnShootEventHandler OnShoot;
         public event OnFireMissileEventHandler OnFireMissile;
@@ -83,7 +87,7 @@ namespace Tanks.model
             OnFireMissile?.Invoke(new Missile
             {
                 Location = Location,
-                Velocity = new PointF(0, 0),
+                Velocity = new PointF(BulletSpeed, 0).Rotate(Angle),
                 Angle = Angle,
                 Owner = this,
                 Target = MissileTarget
@@ -92,6 +96,9 @@ namespace Tanks.model
 
         public void Shoot()
         {
+            if (SecondsSinceLastShot < SecondsBetweenShots) return;
+            
+            SecondsSinceLastShot = 0;
             OnShoot?.Invoke(new Bullet
             {
                 Location = Gun,

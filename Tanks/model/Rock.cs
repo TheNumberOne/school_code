@@ -11,6 +11,9 @@ namespace Tanks.model
         private const int NumBorderPoints = 20;
         private const float RockGenerationAngleDelta = (float) (2 * Math.PI / NumBorderPoints);
 
+        private Shape _border;
+        private PointF _currentBorderCenter;
+
         public PointF Center;
 
         public Rock(PointF center, Random r, float minRadius, float maxRadius)
@@ -20,33 +23,16 @@ namespace Tanks.model
             Prototype = Smooth(RandomRock(r, minRadius, maxRadius)).ToArray();
         }
 
-        public float Angle
-        {
-            get => _angle;
-            set
-            {
-                _angle = value;
-                _border = null;
-            }
-        }
-
         private Shape Prototype { get; }
-
-        private Shape _border;
-        private float _angle;
-        private PointF _currentBorderCenter;
 
         public Shape Border
         {
             get
             {
-                if (Center != _currentBorderCenter)
-                {
-                    _border = null;
-                }
+                if (Center != _currentBorderCenter) _border = null;
 
                 _currentBorderCenter = Center;
-                return _border ?? (_border = Prototype.Transform(p => p.Rotate(Angle).Plus(Center)));
+                return _border ?? (_border = Prototype.Transform(p => p.Plus(Center)));
             }
         }
 

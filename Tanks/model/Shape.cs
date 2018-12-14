@@ -2,39 +2,32 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using MoreLinq;
 using Tanks.utils;
 
 namespace Tanks.model
 {
     public class Shape
     {
-        public Shape(IEnumerable<PointF> points) : this(points.ToArray())
+        private Shape(IEnumerable<PointF> points) : this(points.ToArray())
         {
         }
 
-        public Shape(PointF[] points)
+        private Shape(PointF[] points)
         {
             Points = points;
             Edges = new Edge[points.Length];
-            
+
             for (var i = 0; i < points.Length; i++)
-            {
                 Edges[i] = new Edge
                 {
                     P1 = points[i],
                     P2 = points[i + 1 == points.Length ? 0 : i + 1]
-                }; 
-            }
-
-            for (var i = 0; i < points.Length; i++)
-            {
-                Edges[i].Prev = Edges[i == 0 ? points.Length - 1 : i - 1];
-                Edges[i].Next = Edges[i + 1 == points.Length ? 0 : i + 1];
-            }
+                };
         }
 
-        public PointF[] Points { get; }
+        private PointF[] Points { get; }
+
+        private Edge[] Edges { get; }
 
         public Shape Transform(Func<PointF, PointF> t)
         {
@@ -59,7 +52,7 @@ namespace Tanks.model
                 MaxY() < other.MinY() ||
                 other.MaxY() < MinY())
                 return false;
-            
+
             return Edges.Any(e1 => other.Edges.Any(e1.IsCollision));
         }
 
@@ -71,23 +64,16 @@ namespace Tanks.model
                 p.Y < MinY())
                 return false;
 
-            var numIntersect = 0;
-            foreach (var edge in Edges)
-            {
-                var p1Above = edge.P1.Y > p.Y;
-                var p2Above = edge.P2.Y > p.Y;
-
-                if (p1Above == p2Above) continue;
-
-                var clockwise = Utils.SignedTriangleArea(edge.P1, p, edge.P2) < 0;
-
-                if (clockwise != p1Above) numIntersect++;
-            }
+            var numIntersect = (from edge in Edges
+                let p1Above = edge.P1.Y > p.Y
+                let p2Above = edge.P2.Y > p.Y
+                where p1Above != p2Above
+                let clockwise = Utils.SignedTriangleArea(edge.P1, p, edge.P2) < 0
+                where clockwise != p1Above
+                select p1Above).Count();
 
             return numIntersect % 2 == 1;
         }
-        
-        private Edge[] Edges { get; }
 
         public PointF Center()
         {
@@ -103,22 +89,22 @@ namespace Tanks.model
             return Points.Max(p => p.Distance(c));
         }
 
-        public float MinX()
+        private float MinX()
         {
             return Points.Min(p => p.X);
         }
 
-        public float MaxX()
+        private float MaxX()
         {
             return Points.Max(p => p.X);
         }
 
-        public float MinY()
+        private float MinY()
         {
             return Points.Min(p => p.Y);
         }
 
-        public float MaxY()
+        private float MaxY()
         {
             return Points.Max(p => p.Y);
         }
@@ -128,8 +114,6 @@ namespace Tanks.model
     {
         public PointF P1 { get; set; }
         public PointF P2 { get; set; }
-        public Edge Next { get; set; }
-        public Edge Prev { get; set; }
 
         public bool IsCollision(Edge other)
         {

@@ -59,6 +59,7 @@
     <Compile Include="model\Bullet.cs" />
     <Compile Include="model\EnemyTank.cs" />
     <Compile Include="model\Game.cs" />
+      <Compile Include="model\IUpdateable.cs"/>
     <Compile Include="model\LeaderBoard.cs" />
     <Compile Include="model\Missile.cs" />
     <Compile Include="model\Player.cs" />
@@ -69,7 +70,7 @@
     <Compile Include="model\Vector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="tankOperators\ITankOperator.cs" />
+      <Compile Include="tankOperators\TankAi.cs"/>
     <Compile Include="tankOperators\MediumAI.cs" />
     <Compile Include="tankOperators\MissileAI.cs" />
     <Compile Include="tankOperators\PlayerOperator.cs" />

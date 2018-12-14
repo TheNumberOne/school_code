@@ -3,7 +3,7 @@ using Tanks.model;
 
 namespace Tanks.tankOperators
 {
-    public class SmartAI : ITankOperator
+    public class SmartAi : TankAi
     {
         public void Update(Tank tank, Game game)
         {
