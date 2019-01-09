@@ -65,33 +65,33 @@ int runTests() {
   // TODO: Uncomment tests one by one as you develop your implementation
   // of the algorithm.
 
-  // {
-  //   int array[] = { 8 };
-  //   insertionSort(array, 1);
-  //   int result[] = { 8 };
-  //   TEST(memcmp(array, result, 1*sizeof(int)) == 0);
-  // }
+   {
+     int array[] = { 8 };
+     insertionSort(array, 1);
+     int result[] = { 8 };
+     TEST(memcmp(array, result, 1*sizeof(int)) == 0);
+   }
 
-  // {
-  //   int array[] = { 1, 4, 2, 3 };
-  //   insertionSort(array, 4);
-  //   int result[] = { 1, 2, 3, 4 };
-  //   TEST(memcmp(array, result, 4*sizeof(int)) == 0);
-  // }
+   {
+     int array[] = { 1, 4, 2, 3 };
+     insertionSort(array, 4);
+     int result[] = { 1, 2, 3, 4 };
+     TEST(memcmp(array, result, 4*sizeof(int)) == 0);
+   }
 
-  // {
-  //   int array[] = { 8, 3, 2, 5, 7, 9, 22, 1, 3 };
-  //   insertionSort(array, 9);
-  //   int result[] = { 1, 2, 3, 3, 5, 7, 8, 9, 22 };
-  //   TEST(memcmp(array, result, 9*sizeof(int)) == 0);
-  // }
+   {
+     int array[] = { 8, 3, 2, 5, 7, 9, 22, 1, 3 };
+     insertionSort(array, 9);
+     int result[] = { 1, 2, 3, 3, 5, 7, 8, 9, 22 };
+     TEST(memcmp(array, result, 9*sizeof(int)) == 0);
+   }
 
-  // {
-  //   int* array = 0;
-  //   insertionSort(array, 0);
-  //   int* result = 0;
-  //   TEST(memcmp(array, result, 0*sizeof(int)) == 0);
-  // }
+   {
+     int* array = 0;
+     insertionSort(array, 0);
+     int* result = 0;
+     TEST(memcmp(array, result, 0*sizeof(int)) == 0);
+   }
 
   // Summary of number of tests passed. Do not modify.
   const int numSuccesses = testNum - numFails;
