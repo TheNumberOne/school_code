@@ -131,6 +131,13 @@ int runTests() {
     TEST(memcmp(array, result, 7*sizeof(int)) == 0);
   }
 
+    {
+        int array[] = {};
+        mergeSort(array, 0);
+        int result[] = {};
+        TEST(memcmp(array, result, 0* sizeof(int)) == 0);
+    }
+
   const int numSuccesses = testNum - numFails;
   cout << numSuccesses << "/" << testNum << " tests succeeded" << endl;
 
