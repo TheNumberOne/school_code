@@ -3,4 +3,4 @@ project(homework3)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(homework3 main.cpp)
+add_executable(homework3 main.cpp randlcg.cpp randlcg.hpp)
