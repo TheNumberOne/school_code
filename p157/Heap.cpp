@@ -12,9 +12,9 @@ Heap::Heap() : A(0), arraySize(0), n(0) {}
 // element of the heap.
 Heap::Heap(int *inArray, int inArraySize, int inHeapSize) :
         A(static_cast<size_t>(inHeapSize)),
-        arraySize(inArraySize),
-        n(0) {
-    std::copy(inArray, inArray + inArraySize, A.val);
+        arraySize(inHeapSize),
+        n(inHeapSize) {
+    std::copy(inArray, inArray + inHeapSize, A.val);
 }
 
 // Note: the function name is prefixed by Heap:: (the class
@@ -84,15 +84,17 @@ void Heap::maxHeapify(int i) {
 }
 
 void Heap::buildMaxHeap() {
-
+    for (int i = parent(n - 1); i>=0; i--) {
+        maxHeapify(i);
+    }
 }
 
 bool Heap::hasLeft(int i) const {
-    return false;
+    return left(i) != -1;
 }
 
 bool Heap::hasRight(int i) const {
-    return false;
+    return right(i) != -1;
 }
 
 string toDotImpl(const Heap &h, int i) {
