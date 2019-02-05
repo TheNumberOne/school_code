@@ -15,8 +15,10 @@ find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 link_libraries(${GLEW_LIBRARIES})
 
+find_package(glm REQUIRED)
+include_directories(${GLM_INCLUDE_DIRS})
+link_libraries(${GLM_LIBRARIES})
+
 add_executable(project1
         square.cpp)
-add_executable(annuluses circularAnnuluses.cpp)
-add_executable(helix helix.cpp)
-add_executable(moveSphere moveSphere.cpp)
+add_executable(example rotatingHelix2.cpp)
