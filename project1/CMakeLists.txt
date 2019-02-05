@@ -2,6 +2,20 @@ cmake_minimum_required(VERSION 3.13)
 project(project1)
 
 set(CMAKE_CXX_STANDARD 14)
+find_package(GLUT REQUIRED)
+include_directories(${GLUT_INCLUDE_DIR})
+link_libraries(${GLUT_LIBRARIES})
+
+find_package(OpenGL REQUIRED)
+include_directories(${OpenGL_INCLUDE_DIRS})
+link_libraries(${OPENGL_LIBRARIES})
+
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
+link_libraries(${GLEW_LIBRARIES})
 
 add_executable(project1
         square.cpp)
+add_executable(annuluses circularAnnuluses.cpp)
+add_executable(helix helix.cpp)
+add_executable(moveSphere moveSphere.cpp)
