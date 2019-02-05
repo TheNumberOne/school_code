@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(project1)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+
 find_package(GLUT REQUIRED)
 include_directories(${GLUT_INCLUDE_DIR})
 link_libraries(${GLUT_LIBRARIES})
