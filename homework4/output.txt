@@ -1,0 +1,16 @@
+Default vehicle: Vehicle{year=2015, miles=55000, value=20000, manufacturer=Chevrolet, model=Colorado}
+Set miles and year: Vehicle{year=2014, miles=50000, value=20000, manufacturer=Chevrolet, model=Colorado}
+
+My car: Vehicle{year=2004, miles=190000, value=2000, manufacturer=Mazda, model=6}
+Set manufacturer and model: Vehicle{year=2004, miles=190000, value=4321, manufacturer=Toyota, model=Camry}
+
+Default truck: Truck{Vehicle{year=2015, miles=55000, value=20000, manufacturer=Chevrolet, model=Colorado}, awd=4x4, towingCapacity=5000}
+Truck cast as vehicle: Truck{Vehicle{year=2015, miles=55000, value=20000, manufacturer=Chevrolet, model=Colorado}, awd=4x4, towingCapacity=5000}
+Set all wheel drive and towing capacity: Truck{Vehicle{year=2015, miles=55000, value=20000, manufacturer=Chevrolet, model=Colorado}, awd=2wd, towingCapacity=200}
+
+Trucks:
+Truck{Vehicle{year=2019, miles=0, value=28155, manufacturer=Ford, model=F-150}, awd=4WD, towingCapacity=6500}
+Truck{Vehicle{year=2007, miles=175962, value=5400, manufacturer=Chevrolet, model=Silverado 1500 LS}, awd=4WD, towingCapacity=5000}
+Truck{Vehicle{year=2018, miles=5000, value=32998, manufacturer=Honda, model=Ridgeline RTL-T}, awd=AWD, towingCapacity=4250}
+Truck{Vehicle{year=2016, miles=47000, value=28998, manufacturer=Dodge, model=Ram 1500 Sport}, awd=4x4, towingCapacity=6700}
+Truck{Vehicle{year=2004, miles=180000, value=29000, manufacturer=Kenworth, model=T2000}, awd=rwd, towingCapacity=50000}
