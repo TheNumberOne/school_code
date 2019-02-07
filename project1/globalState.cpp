@@ -3,3 +3,6 @@
 //
 
 #include "globalState.h"
+
+int width;
+int height;

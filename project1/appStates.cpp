@@ -8,9 +8,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "appStates.h"
 #include "globalState.h"
+#include "colors.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 
+
+constexpr double PI = std::acos(-1);
 
 template<size_t width>
 std::array<glm::vec3, width> oneColor1(glm::vec3 c) {
@@ -45,17 +49,6 @@ std::unique_ptr<AppState> SecondAppState::nextState() {
     return std::make_unique<ThirdAppState>();
 }
 
-glm::vec3 generateRandomColor();
-
-template<size_t width>
-std::array<glm::vec3, width> generateColors1() {
-    std::array<glm::vec3, width> ret{};
-    for (int i = 0; i < width; i++) {
-        ret[i] = generateRandomColor();
-    }
-    return ret;
-}
-
 ThirdAppState::ThirdAppState():
     m_bigSquareColors(generateColors1<36>()),
     m_littleSquareColors(generateColors1<16>()){}
@@ -87,7 +80,7 @@ glm::mat4 FourthAppState::getCamera() {
 
     // Then rotate the image such that the centers align along the diagonal from upper left
     // to lower right.
-    camera = glm::rotate(3.1415926f / 2 - theta, glm::vec3{0, 0, 1}) * camera;
+    camera = glm::rotate(static_cast<float>(PI) / 2 - theta, glm::vec3{0, 0, 1}) * camera;
 
     // Then convert that to a perspective view.
 //        camera = glm::frustum(left, right, bottom, top, near, far) * camera;
@@ -95,4 +88,8 @@ glm::mat4 FourthAppState::getCamera() {
     camera = glm::ortho(left * 2, right * 2, bottom * 2, top * 2, near, far) * camera;
 
     return camera;
+}
+
+std::unique_ptr<AppState> FourthAppState::nextState() {
+    return std::make_unique<InitialAppState>();
 }

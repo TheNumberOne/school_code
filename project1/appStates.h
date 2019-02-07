@@ -68,4 +68,5 @@ public:
     ~FourthAppState() override = default;
 
     glm::mat4 getCamera() override;
+    std::unique_ptr<AppState> nextState() override;
 };
