@@ -63,9 +63,9 @@ glm::mat4 FourthAppState::getCamera() {
     glm::vec3 blueCenter{10, -10, 0};
     glm::vec3 center = (redCenter + blueCenter) / 2.f;
     float distance = 50;
-    glm::vec3 cameraPosition = glm::normalize(glm::cross(blueCenter - center, {0, 1, 0})) * distance;
+    glm::vec3 cameraPosition = glm::normalize(glm::cross(blueCenter - center, {0, 1, 0})) * distance + center;
 
-    auto theta = static_cast<float>(std::atan2(height, width));
+    float theta = std::atan2(height, width);
     float width = glm::length(redCenter - center);
 
     float near = distance / 2;
@@ -83,9 +83,7 @@ glm::mat4 FourthAppState::getCamera() {
     camera = glm::rotate(static_cast<float>(PI) / 2 - theta, glm::vec3{0, 0, 1}) * camera;
 
     // Then convert that to a perspective view.
-//        camera = glm::frustum(left, right, bottom, top, near, far) * camera;
-
-    camera = glm::ortho(left * 2, right * 2, bottom * 2, top * 2, near, far) * camera;
+    camera = glm::frustum(left, right, bottom, top, near, far) * camera;
 
     return camera;
 }

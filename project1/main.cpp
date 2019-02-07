@@ -29,6 +29,8 @@ void slideTowards(T &from, const T &to, float fraction) {
 
 void animate(int) {
 
+    // Check isnan because width and height are originally nan which causes the
+    // initial camera to be filled with nan.
     if (std::isnan(camera[0][0])) camera = currentState->getCamera();
 
     auto m = static_cast<float>(std::pow(.5, animPeriodMs / animHalfLifeMs));
@@ -108,7 +110,6 @@ void drawScene() {
 
 // Initialization routine.
 void setup() {
-    glEnable(GL_MULTISAMPLE);
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glutTimerFunc(animPeriodMs, animate, 1);
 }
