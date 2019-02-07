@@ -20,5 +20,5 @@ include_directories(${GLM_INCLUDE_DIRS})
 link_libraries(${GLM_LIBRARIES})
 
 add_executable(project1
-        square.cpp)
+        square.cpp appStates.cpp appStates.h globalState.cpp globalState.h)
 add_executable(example rotatingHelix2.cpp)
