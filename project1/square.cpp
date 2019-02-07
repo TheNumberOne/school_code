@@ -12,14 +12,14 @@
 #include "appStates.h"
 #include "globalState.h"
 
-std::unique_ptr<AppState> currentState = std::make_unique<InitialAppState>();
 
+std::unique_ptr<AppState> currentState = std::make_unique<InitialAppState>();
 std::array<glm::vec3, 36> bigSquareColors = currentState->bigSquareColors();
 std::array<glm::vec3, 16> littleSquareColors = currentState->littleSquareColors();
 glm::mat4 camera = currentState->getCamera();
 
-float msHalfLife = 500;
-uint animPeriod = 50;
+const float animHalfLifeMs = 500;
+const uint animPeriodMs = 50;
 
 template<typename T>
 void slideTowards(T &from, const T &to, float fraction) {
@@ -28,9 +28,10 @@ void slideTowards(T &from, const T &to, float fraction) {
 
 
 void animate(int) {
+
     if (std::isnan(camera[0][0])) camera = currentState->getCamera();
 
-    auto m = static_cast<float>(std::pow(.5, animPeriod / msHalfLife));
+    auto m = static_cast<float>(std::pow(.5, animPeriodMs / animHalfLifeMs));
     slideTowards(camera, currentState->getCamera(), m);
 
     auto targetBigSquareColors = currentState->bigSquareColors();
@@ -44,7 +45,7 @@ void animate(int) {
     }
 
     glutPostRedisplay();
-    glutTimerFunc(animPeriod, animate, 1);
+    glutTimerFunc(animPeriodMs, animate, 1);
 }
 
 void drawScene() {
@@ -109,7 +110,7 @@ void drawScene() {
 void setup() {
     glEnable(GL_MULTISAMPLE);
     glClearColor(0.0, 0.0, 0.0, 0.0);
-    glutTimerFunc(animPeriod, animate, 1);
+    glutTimerFunc(animPeriodMs, animate, 1);
 }
 
 // OpenGL window reshape routine.

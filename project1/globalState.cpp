@@ -2,7 +2,8 @@
 // Created by thenumberone on 2/6/19.
 //
 
+#include <cmath>
 #include "globalState.h"
 
-int width;
-int height;
+float width = std::nanf("");
+float height = std::nanf("");

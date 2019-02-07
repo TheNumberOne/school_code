@@ -1,4 +1,4 @@
 #pragma once
 
-extern int width;
-extern int height;
+extern float width;
+extern float height;
