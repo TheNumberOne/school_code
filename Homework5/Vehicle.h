@@ -29,7 +29,7 @@ public:
     /**
      * Returns the value that this vehicle is estimated to be at the specified date.
      */
-    float estimateValue(float date) const;
+    double estimateValue(float date) const;
 
     int getYear() const { return mYear; }
 

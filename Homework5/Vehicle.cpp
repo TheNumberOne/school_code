@@ -37,6 +37,6 @@ void Vehicle::updateValue(float currentDate) {
     value_date = currentDate;
 }
 
-float Vehicle::estimateValue(float date) const {
-    return static_cast<float>(mValue * std::pow(depreciationRate, date - value_date));
+double Vehicle::estimateValue(float date) const {
+    return mValue * std::pow(depreciationRate, date - value_date);
 }
