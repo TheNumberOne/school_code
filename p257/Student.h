@@ -8,34 +8,35 @@
 #include <string>
 
 class Student {
- public:
-  Student() {
-    _name = "";
-    _id = 0;
-  }
+public:
+    Student() {
+        _name = "";
+        _id = 0;
+    }
 
-  Student(const std::string& name, const int id) {
-    _name = name;
-    _id = id;
-  }
+    Student(const std::string &name, const int id) {
+        _name = name;
+        _id = id;
+    }
 
-  const std::string& name() const { return _name; }
-  const int id() const { return _id; }
+    const std::string &name() const { return _name; }
 
-  bool operator==(const Student& rhs) const {
-    return name() == rhs.name() && id() == rhs.id();
-  }
+    const int id() const { return _id; }
 
-  bool operator!=(const Student& rhs) const {
-    return !(*this == rhs);
-  }
+    bool operator==(const Student &rhs) const {
+        return name() == rhs.name() && id() == rhs.id();
+    }
 
-  friend std::ostream& operator<<(std::ostream& out, const Student& p) {
-    out << p.name() << " " << p.id();
-    return out;
-  }
+    bool operator!=(const Student &rhs) const {
+        return !(*this == rhs);
+    }
 
- private:
-  std::string _name;
-  int _id;
+    friend std::ostream &operator<<(std::ostream &out, const Student &p) {
+        out << p.name() << " " << p.id();
+        return out;
+    }
+
+private:
+    std::string _name;
+    int _id;
 };

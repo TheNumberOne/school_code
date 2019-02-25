@@ -8,34 +8,35 @@
 #include <string>
 
 class Person {
- public:
-  Person() {
-    _name = "";
-    _age = 0;
-  }
+public:
+    Person() {
+        _name = "";
+        _age = 0;
+    }
 
-  Person(const std::string& name, const int age) {
-    _name = name;
-    _age = age;
-  }
+    Person(const std::string &name, const int age) {
+        _name = name;
+        _age = age;
+    }
 
-  const std::string& name() const { return _name; }
-  const int age() const { return _age; }
+    const std::string &name() const { return _name; }
 
-  bool operator==(const Person& rhs) const {
-    return name() == rhs.name() && age() == rhs.age();
-  }
+    const int age() const { return _age; }
 
-  bool operator!=(const Person& rhs) const {
-    return !(*this == rhs);
-  }
+    bool operator==(const Person &rhs) const {
+        return name() == rhs.name() && age() == rhs.age();
+    }
 
-  friend std::ostream& operator<<(std::ostream& out, const Person& p) {
-    out << p.name() << " " << p.age();
-    return out;
-  }
+    bool operator!=(const Person &rhs) const {
+        return !(*this == rhs);
+    }
 
- private:
-  std::string _name;
-  int _age;
+    friend std::ostream &operator<<(std::ostream &out, const Person &p) {
+        out << p.name() << " " << p.age();
+        return out;
+    }
+
+private:
+    std::string _name;
+    int _age;
 };
