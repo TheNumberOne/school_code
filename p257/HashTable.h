@@ -36,8 +36,6 @@ private:
     //--------------------------------------------------
     class KeyValue {
     public:
-        KeyValue() {}
-
         KeyValue(const int key, const T &value) {
             _key = key;
             _value = value;
@@ -47,7 +45,7 @@ private:
 
         const T &value() const { return _value; }
 
-        bool operator==(const KeyValue &rhs) {
+        bool operator==(const KeyValue &rhs) const {
             return _key == rhs._key;
         }
 
@@ -59,21 +57,92 @@ private:
     //--------------------------------------------------
     // Remaining implementation of the HashTable.
     //--------------------------------------------------
+public:
+    explicit HashTable(size_t capacity) : _bins(capacity), _a(new LinkedList<KeyValue>[capacity]) {}
 
+    HashTable(const HashTable<T, Hash> &) = delete;
 
-    // TODO: uncomment this function after implementing getKeys().
-    // friend std::ostream& operator<<(std::ostream& out, HashTable& t) {
-    //   const int n = t.size();
-    //   int* keys = new int[n];
-    //   t.getKeys(keys);
-    //   for (int i = 0; i < n; ++i) {
-    //     const int key = keys[i];
-    //     out << t.get(key) << "; ";
-    //   }
-    //   delete [] keys;
-    //   return out;
-    // }
+    HashTable<T, Hash> &operator=(const HashTable<T, Hash> &) = delete;
+
+    ~HashTable() { delete[] _a; }
+
+    /**
+     * Returns the total number of items in this hashtable.
+     */
+    size_t size() const { return _size; }
+
+    /**
+     * Returns the total number of items in the bucket with the specified index
+     */
+    size_t size(size_t i) const {
+        return _a[i].size();
+    }
+
+    /**
+     * Puts the key value pair into this dictionary.
+     */
+    void put(int key, T value) {
+        KeyValue toInsert{key, value};
+        auto &b = bin(key);
+        if (!b.find(toInsert)) {
+            b.insert(new ListNode<KeyValue>(toInsert));
+            _size++;
+        }
+    }
+
+    /**
+     * Returns if this contains the specified key
+     */
+    bool contains(int key) const {
+        return bin(key).find({key, {}}) != nullptr;
+    }
+
+    /**
+     * Returns the specified value at the specified index.
+     */
+    const T &get(int key) const {
+        auto node = bin(key).find({key, {}});
+        if (node == nullptr) throw std::runtime_error("No value for key");
+        return node->data().value();
+    }
+
+    /**
+     * Copies the keys into the passed array.
+     */
+    void getKeys(int out[]) {
+        size_t j = 0;
+        for (size_t i = 0; i < _bins; i++) {
+            auto h = _a[i]._head;
+            while (h != nullptr) {
+                out[j++] = h->data().key();
+                h = h->next();
+            }
+        }
+    }
+
+    friend std::ostream &operator<<(std::ostream &out, HashTable &t) {
+        size_t n = t.size();
+        auto keys = new int[n];
+        t.getKeys(keys);
+        for (int i = 0; i < n; ++i) {
+            const int key = keys[i];
+            out << t.get(key) << "; ";
+        }
+        delete[] keys;
+        return out;
+    }
 
 private:
     Hash _h;
+    size_t _size = 0;
+    size_t _bins;
+    LinkedList<KeyValue> *_a;
+
+    LinkedList<KeyValue> &bin(int key) {
+        return _a[_h(key, (int) _bins)];
+    }
+
+    const LinkedList<KeyValue> &bin(int key) const {
+        return _a[_h(key, (int) _bins)];
+    }
 };
