@@ -87,6 +87,8 @@ void drawScene() {
 
     glDisable(GL_DEPTH_TEST);
 
+    // Draw reference points.
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-1, 1, -1, 1, 0, 1);
