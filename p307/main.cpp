@@ -59,23 +59,29 @@
 
 using namespace std;
 
-class Identity {
+class Identity
+{
 public:
-    int operator()(const int i) const {
+    int operator()(const int i) const
+    {
         return i;
     }
 };
 
-class GetId {
+class GetId
+{
 public:
-    int operator()(const Student &s) const {
+    int operator()(const Student &s) const
+    {
         return s.id();
     }
 };
 
-class GetAge {
+class GetAge
+{
 public:
-    int operator()(const Student &s) const {
+    int operator()(const Student &s) const
+    {
         return s.age();
     }
 };
@@ -83,11 +89,12 @@ public:
 //------------------------------------------------------------
 // Tests
 //------------------------------------------------------------
-int runTests() {
-
+int runTests()
+{
+    
     int numFails = 0;
     int testNum = 0;
-
+    
     {
         BinarySearchTree<int, Identity> tree;
         string target = R"str(
@@ -97,7 +104,7 @@ int runTests() {
  )str";
         // 1
         TEST(stringEquals(tree.toDot(), target));
-
+        
         tree.insert(8);
         target = R"str(
  digraph G {
@@ -107,7 +114,7 @@ int runTests() {
  )str";
         // 2
         TEST(stringEquals(tree.toDot(), target));
-
+        
         tree.insert(3);
         target = R"str(
  digraph G {
@@ -119,7 +126,7 @@ int runTests() {
  )str";
         // 3
         TEST(stringEquals(tree.toDot(), target));
-
+        
         tree.insert(12);
         target = R"str(
  digraph G {
@@ -133,7 +140,7 @@ int runTests() {
  )str";
         // 4
         TEST(stringEquals(tree.toDot(), target));
-
+        
         tree.insert(15);
         target = R"str(
  digraph G {
@@ -150,7 +157,7 @@ int runTests() {
         // 5
         TEST(stringEquals(tree.toDot(), target));
     }
-
+    
     {
         BinarySearchTree<int, Identity> tree;
         tree.insert(12);
@@ -172,7 +179,7 @@ int runTests() {
         // 6
         TEST(stringEquals(tree.toDot(), target));
     }
-
+    
     {
         BinarySearchTree<int, Identity> tree;
         tree.insert(3);
@@ -193,7 +200,7 @@ int runTests() {
  )str";
         TEST(stringEquals(tree.toDot(), target));
     }
-
+    
     {
         BinarySearchTree<int, Identity> tree;
         tree.insert(8);
@@ -247,7 +254,7 @@ int runTests() {
  )str";
         TEST(stringEquals(tree.toDot(), target));
     }
-
+    
     {
         BinarySearchTree<int, Identity> tree;
         tree.insert(8);
@@ -301,7 +308,7 @@ int runTests() {
  )str";
         TEST(stringEquals(tree.toDot(), target));
     }
-
+    
     {
         BinarySearchTree<int, Identity> tree;
         tree.insert(8);
@@ -314,7 +321,7 @@ int runTests() {
         TEST(tree.min() == 4);
         TEST(tree.max() == 10);
     }
-
+    
     {
         BinarySearchTree<int, Identity> tree;
         tree.insert(11);
@@ -323,7 +330,7 @@ int runTests() {
         TEST(tree.min() == 5);
         TEST(tree.max() == 11);
     }
-
+    
     {
         BinarySearchTree<int, Identity> tree;
         tree.insert(11);
@@ -334,12 +341,12 @@ int runTests() {
         TEST(tree.contains(5));
         TEST(!tree.contains(1));
         TEST(!tree.contains(6));
-
+        
         TEST(tree.get(11) == 11);
         TEST(tree.get(7) == 7);
         TEST(tree.get(5) == 5);
     }
-
+    
     {
         // Use GetId as the getKey function so that nodes
         // will be ordered by student ID.
@@ -361,16 +368,16 @@ int runTests() {
  }
  )str";
         TEST(stringEquals(tree.toDot(), target));
-
+        
         TEST(tree.contains(587));
         TEST(tree.contains(223));
         TEST(tree.contains(982));
         TEST(!tree.contains(21));
         TEST(!tree.contains(22));
-
+        
         TEST(tree.get(587).name() == "Joe");
         TEST(tree.get(223).name() == "Sally");
-
+        
         // Inserts elements in order into array. Students should
         // be ordered by student ID.
         Student students[4];
@@ -381,7 +388,7 @@ int runTests() {
         TEST(students[2].name() == "Joe");
         TEST(students[3].name() == "Kylie");
     }
-
+    
     {
         // Use GetAge as the getKey function so that nodes
         // will be ordered by age.
@@ -403,16 +410,16 @@ int runTests() {
  }
  )str";
         TEST(stringEquals(tree.toDot(), target));
-
+        
         TEST(!tree.contains(587));
         TEST(!tree.contains(223));
         TEST(!tree.contains(982));
         TEST(tree.contains(21));
         TEST(tree.contains(22));
-
+        
         TEST(tree.get(21).name() == "Joe");
         TEST(tree.get(22).name() == "Sally");
-
+        
         Student students[4];
         tree.getInOrder(students);
         printArray(students, 4);
@@ -421,68 +428,69 @@ int runTests() {
         TEST(students[2].name() == "Sally");
         TEST(students[3].name() == "Josh");
     }
-
-//   {
-//     BinarySearchTree<int, Identity> tree;
-//     tree.insert(11);
-//     tree.insert(7);
-//     tree.insert(5);
-//     tree.insert(18);
-//     tree.insert(12);
-//     tree.remove(5);
-//     TEST(!tree.contains(5));
-
-//     string target = R"str(
-// digraph G {
-// graph [ordering="out"]
-// "7"
-// "11"
-// "12"
-// "18"
-// "11" -> "7"
-// "11" -> "18"
-// "18" -> "12"
-// }
-// )str";
-//     TEST(stringEquals(tree.toDot(), target));
-
-//     tree.insert(13);
-//     tree.insert(19);
-//     tree.insert(4);
-//     tree.insert(10);
-//     tree.remove(11);
-//     TEST(!tree.contains(11));
-
-//     target = R"str(
-// digraph G {
-// graph [ordering="out"]
-// "4"
-// "7"
-// "10"
-// "12"
-// "13"
-// "18"
-// "19"
-// "12" -> "7"
-// "12" -> "18"
-// "7" -> "4"
-// "7" -> "10"
-// "18" -> "13"
-// "18" -> "19"
-// }
-// )str";
-//     TEST(stringEquals(tree.toDot(), target));
-//   }
-
+    
+    {
+        BinarySearchTree<int, Identity> tree;
+        tree.insert(11);
+        tree.insert(7);
+        tree.insert(5);
+        tree.insert(18);
+        tree.insert(12);
+        tree.remove(5);
+        TEST(!tree.contains(5));
+        
+        string target = R"str(
+ digraph G {
+ graph [ordering="out"]
+ "7"
+ "11"
+ "12"
+ "18"
+ "11" -> "7"
+ "11" -> "18"
+ "18" -> "12"
+ }
+ )str";
+        TEST(stringEquals(tree.toDot(), target));
+        
+        tree.insert(13);
+        tree.insert(19);
+        tree.insert(4);
+        tree.insert(10);
+        tree.remove(11);
+        TEST(!tree.contains(11));
+        
+        target = R"str(
+ digraph G {
+ graph [ordering="out"]
+ "4"
+ "7"
+ "10"
+ "12"
+ "13"
+ "18"
+ "19"
+ "12" -> "7"
+ "12" -> "18"
+ "7" -> "4"
+ "7" -> "10"
+ "18" -> "13"
+ "18" -> "19"
+ }
+ )str";
+        TEST(stringEquals(tree.toDot(), target));
+    }
+    
     const int numSuccesses = testNum - numFails;
     cout << numSuccesses << "/" << testNum << " tests succeeded" <<
          endl;
-
+    
     return
-            numFails;
+        numFails;
 }
 
-int main() {
+int main()
+{
     return runTests();
 }
 
