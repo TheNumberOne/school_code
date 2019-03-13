@@ -8,7 +8,7 @@
 void drawLightSource()
 {
     glm::vec4 ambience{0, 0, 0, 1};
-    glm::vec4 lightColor{1, 1, 1, 1};
+    glm::vec4 lightColor{.9, .9, .9, 1};
     glm::vec4 lightPosition{0, 4, 0, 1};
     glLightfv(GL_LIGHT0, GL_AMBIENT, glm::value_ptr(ambience));
     glLightfv(GL_LIGHT0, GL_DIFFUSE, glm::value_ptr(lightColor));

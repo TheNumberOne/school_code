@@ -18,6 +18,6 @@ include_directories(${GLM_INCLUDE_DIRS})
 find_package(SDL2 REQUIRED STATIC)
 include_directories(${SDL2_INCLUDE_DIRS})
 
-add_executable(project2 main.cpp SimpleHouse.cpp SimpleHouse.hpp Camera.cpp Camera.hpp sdl.cpp sdl.hpp light.cpp light.hpp)
+add_executable(project2 main.cpp SimpleHouse.cpp SimpleHouse.hpp Camera.cpp Camera.hpp sdl.cpp sdl.hpp light.cpp light.hpp material.cpp material.hpp rectangular_wall_with_holes.cpp rectangular_wall_with_holes.h gl_util.cpp gl_util.h)
 add_dependencies(project2 OpenGL::OpenGL)
 target_link_libraries(project2 OpenGL::OpenGL ${GLEW_LIBRARIES} ${GLM_LIBRARIES} ${GLUT_LIBRARIES} ${SDL2_LIBRARIES})

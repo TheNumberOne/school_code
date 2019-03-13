@@ -19,8 +19,7 @@ uint msPerFrame = 1000 / 60;
 
 sdl::gl::context_unique_ptr initGlContext(SDL_Window *window);
 
-class Application
-{
+class Application {
 public:
     Application() : window(
         sdl::createWindow(
@@ -31,38 +30,35 @@ public:
             600,
             SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
         )
-    ), gl_context(initGlContext(window.get()))
-    {
+    ), gl_context(initGlContext(window.get())) {
         resize(850, 600);
     }
-    
-    void drawScene()
-    {
+
+    void drawScene() {
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
-        
+
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glLoadMatrixf(value_ptr(camera.getPerspectiveMatrix()));
-        
+
         drawLightSource();
         scene.draw();
-        
+
         GLenum err;
         if ((err = glGetError()) != GL_NO_ERROR) {
             std::cout << err << std::endl;
             throw std::runtime_error(std::string("Gl error: ") + std::to_string(err));
         }
     }
-    
-    void gameLoop()
-    {
+
+    void gameLoop() {
         SDL_Event event;
         unsigned int lastTime = SDL_GetTicks();
         while (!exit) {
             bool eventFound = sdl::waitEventTimeout(&event, msPerFrame);
             if (eventFound) handleEvents(event);
-            
+
             uint currentTime = SDL_GetTicks();
             camera.tick((currentTime - lastTime) / 1000.f);
             lastTime = currentTime;
@@ -70,9 +66,8 @@ public:
             sdl::gl::swap_window(window.get());
         }
     }
-    
-    void handleEvents(const SDL_Event &event)
-    {
+
+    void handleEvents(const SDL_Event &event) {
         switch (event.type) {
             case SDL_WINDOWEVENT:
                 if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
@@ -95,27 +90,25 @@ public:
                 break;
         }
     }
-    
-    void checkKeyboardState()
-    {
+
+    void checkKeyboardState() {
         auto keyboard = SDL_GetKeyboardState(nullptr);
         bool left = keyboard[SDL_SCANCODE_LEFT];
         bool right = keyboard[SDL_SCANCODE_RIGHT];
         bool up = keyboard[SDL_SCANCODE_UP];
         bool down = keyboard[SDL_SCANCODE_DOWN];
-        
+
         if (left && !right) { camera.rotateLeft(); }
         else if (right && !left) { camera.rotateRight(); }
         else { camera.stopRotating(); }
-        
+
         if (up && !down) { camera.moveForward(); }
         else if (down && !up) { camera.moveBackwards(); }
         else { camera.stopMoving(); }
     }
-    
+
     // OpenGL window reshape routine.
-    void resize(int w, int h)
-    {
+    void resize(int w, int h) {
         glViewport(0, 0, w, h);
         camera.setAspectRatio((float) w / h);
     }
@@ -129,8 +122,7 @@ private:
 };
 
 // Main routine.
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     sdl::initialize library(SDL_INIT_VIDEO);
     std::vector<std::tuple<SDL_GLattr, int>> attrs{
         {SDL_GL_CONTEXT_MAJOR_VERSION, 3},
@@ -147,31 +139,30 @@ int main(int argc, char **argv)
     for (auto[key, value] : attrs) {
         sdl::gl::set_attribute(key, value);
     }
-    
+
     Application app;
     app.gameLoop();
-    
+
     return 0;
 }
 
-sdl::gl::context_unique_ptr initGlContext(SDL_Window *window)
-{
+sdl::gl::context_unique_ptr initGlContext(SDL_Window *window) {
     sdl::gl::context_unique_ptr context = sdl::gl::create_context(window);
     sdl::gl::set_swap_interval(1);
     glewExperimental = GL_TRUE;
     glewInit();
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    
-    
+
+
     glm::vec4 light{.2, .2, .2, 1};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, value_ptr(light));
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-    
+
     return context;
 }

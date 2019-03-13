@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera() : _position(0, 2, 0),
+Camera::Camera() : _position(0, 1.8, 9),
                    _up(0, 1, 0),
                    _lineOfSight(glm::vec3(0, 0, -1)),
                    _aspectRatio(16.f / 9) { }
