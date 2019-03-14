@@ -14,6 +14,7 @@
 #include "Camera.hpp"
 #include "light.hpp"
 #include "draw_container.h"
+#include "display_lists_cache.h"
 #include <glm/gtc/matrix_transform.inl>
 
 uint msPerFrame = 1000 / 60;
@@ -21,7 +22,7 @@ uint msPerFrame = 1000 / 60;
 sdl::gl::context_unique_ptr initGlContext(SDL_Window *window);
 
 auto generate_scene() {
-    return multi_transform(
+    return display_lists_cache(multi_transform(
         transform(
             SimpleHouse(),
             glm::translate(glm::mat4(1), {0, 0, -20})
@@ -30,7 +31,7 @@ auto generate_scene() {
         glm::rotate(glm::mat4(1), glm::pi<float>() / 2, {0, 1, 0}),
         glm::rotate(glm::mat4(1), glm::pi<float>(), {0, 1, 0}),
         glm::rotate(glm::mat4(1), glm::pi<float>() * 3 / 2, {0, 1, 0})
-    );
+    ));
 }
 
 class Application {
@@ -141,9 +142,9 @@ private:
 int main(int argc, char **argv) {
     sdl::initialize library(SDL_INIT_VIDEO);
     std::vector<std::tuple<SDL_GLattr, int>> attrs{
-        {SDL_GL_CONTEXT_MAJOR_VERSION, 3},
-        {SDL_GL_CONTEXT_MINOR_VERSION, 2},
-        {SDL_GL_CONTEXT_PROFILE_MASK,  SDL_GL_CONTEXT_PROFILE_COMPATIBILITY},
+//        {SDL_GL_CONTEXT_MAJOR_VERSION, 3},
+//        {SDL_GL_CONTEXT_MINOR_VERSION, 2},
+//        {SDL_GL_CONTEXT_PROFILE_MASK,  SDL_GL_CONTEXT_PROFILE_COMPATIBILITY},
         {SDL_GL_MULTISAMPLEBUFFERS,    1},
         {SDL_GL_MULTISAMPLESAMPLES,    16},
         {SDL_GL_RED_SIZE,              8},

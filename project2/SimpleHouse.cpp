@@ -71,7 +71,9 @@ void SimpleHouse::draw() const {
                 walls_outside_y,
                 width,
                 wall_thickness,
-                {},
+                {
+                    {window_width, window_width, -width * 2 / 5, windows_center_y}
+                },
                 materials[0]
             },
             glm::translate(glm::mat4(1), {0, 0, -length / 2})
