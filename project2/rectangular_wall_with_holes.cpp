@@ -6,7 +6,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 wall::wall(float inside_height, float outside_height, float width, float thickness, const std::vector<hole> &holes,
-           const material &material) : _inside_height(inside_height), _outside_height(outside_height), _width(width),
+           const material &material) : _inside_height_left(inside_height), _inside_height_right(inside_height),
+                                       _outside_height_left(outside_height), _outside_height_right(outside_height),
+                                       _width(width),
                                        _thickness(thickness), _holes(holes), _material(material) {
     std::sort(_holes.begin(), _holes.end(), [](const hole &a, const hole &b) {
         return a.x < b.x;
@@ -14,7 +16,7 @@ wall::wall(float inside_height, float outside_height, float width, float thickne
 }
 
 
-void wall::draw() {
+void wall::draw() const {
     float left = -_width / 2;
     float right = _width / 2;
 
@@ -38,26 +40,26 @@ void wall::draw() {
         float hole_bottom = hole.y - hole.height / 2;
 
         std::vector<glm::vec3> points{
-            {current_left, _inside_height,  0},
-            {current_left, 0,               0},
-            {hole_left,    _inside_height,  0},
-            {hole_left,    hole_top,        0},
-            {hole_left,    hole_bottom,     0},
-            {hole_left,    0,               0},
-            {hole_right,   _inside_height,  0},
-            {hole_right,   hole_top,        0},
-            {hole_right,   hole_bottom,     0},
-            {hole_right,   0,               0},
-            {current_left, _outside_height, -_thickness},
-            {current_left, 0,               -_thickness},
-            {hole_left,    _outside_height, -_thickness},
-            {hole_left,    hole_top,        -_thickness},
-            {hole_left,    hole_bottom,     -_thickness},
-            {hole_left,    0,               -_thickness},
-            {hole_right,   _outside_height, -_thickness},
-            {hole_right,   hole_top,        -_thickness},
-            {hole_right,   hole_bottom,     -_thickness},
-            {hole_right,   0,               -_thickness},
+            {current_left, inside_height(current_left),  0},
+            {current_left, 0,                            0},
+            {hole_left,    inside_height(hole_left),     0},
+            {hole_left,    hole_top,                     0},
+            {hole_left,    hole_bottom,                  0},
+            {hole_left,    0,                            0},
+            {hole_right,   inside_height(hole_right),    0},
+            {hole_right,   hole_top,                     0},
+            {hole_right,   hole_bottom,                  0},
+            {hole_right,   0,                            0},
+            {current_left, outside_height(current_left), -_thickness},
+            {current_left, 0,                            -_thickness},
+            {hole_left,    outside_height(hole_left),    -_thickness},
+            {hole_left,    hole_top,                     -_thickness},
+            {hole_left,    hole_bottom,                  -_thickness},
+            {hole_left,    0,                            -_thickness},
+            {hole_right,   outside_height(hole_right),   -_thickness},
+            {hole_right,   hole_top,                     -_thickness},
+            {hole_right,   hole_bottom,                  -_thickness},
+            {hole_right,   0,                            -_thickness},
         };
 
         std::vector<std::vector<size_t>> shapes{
@@ -81,9 +83,9 @@ void wall::draw() {
             1,
             1,
             2,
-            4,
+            5,
             3,
-            5
+            4
         };
 
         display_mesh(points, shapes, normals, normal_indices);
@@ -93,8 +95,8 @@ void wall::draw() {
     std::vector<glm::vec3> points{};
 
     for (auto l : {left, current_left, right}) {
-        points.emplace_back(l, _inside_height, 0);
-        points.emplace_back(l, _outside_height, -_thickness);
+        points.emplace_back(l, inside_height(l), 0);
+        points.emplace_back(l, outside_height(l), -_thickness);
         points.emplace_back(l, 0, -_thickness);
         points.emplace_back(l, 0, 0);
     }
@@ -115,6 +117,22 @@ void wall::draw() {
         5
     };
     display_mesh(points, shapes, normals, normal_indices);
+}
+
+wall::wall(float inside_height_left, float outside_height_left, float inside_height_right,
+           float outside_height_right, float width, float thickness, const std::vector<hole> &_holes,
+           const material &_material) : _inside_height_left(inside_height_left),
+                                        _outside_height_left(outside_height_left),
+                                        _inside_height_right(inside_height_right),
+                                        _outside_height_right(outside_height_right), _width(width),
+                                        _thickness(thickness), _holes(_holes), _material(_material) {}
+
+float wall::inside_height(float x) const {
+    return (x + _width / 2) / _width * (_inside_height_right - _inside_height_left) + _inside_height_left;
+}
+
+float wall::outside_height(float x) const {
+    return (x + _width / 2) / _width * (_outside_height_right - _outside_height_left) + _outside_height_left;
 }
 
 hole::hole(float width, float height, float x, float y) : width(width), height(height), x(x), y(y) {}

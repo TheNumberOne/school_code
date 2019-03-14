@@ -13,11 +13,25 @@
 #include "sdl.hpp"
 #include "Camera.hpp"
 #include "light.hpp"
-#include <glm/gtc/type_ptr.hpp>
+#include "draw_container.h"
+#include <glm/gtc/matrix_transform.inl>
 
 uint msPerFrame = 1000 / 60;
 
 sdl::gl::context_unique_ptr initGlContext(SDL_Window *window);
+
+auto generate_scene() {
+    return multi_transform(
+        transform(
+            SimpleHouse(),
+            glm::translate(glm::mat4(1), {0, 0, -20})
+        ),
+        glm::mat4(1),
+        glm::rotate(glm::mat4(1), glm::pi<float>() / 2, {0, 1, 0}),
+        glm::rotate(glm::mat4(1), glm::pi<float>(), {0, 1, 0}),
+        glm::rotate(glm::mat4(1), glm::pi<float>() * 3 / 2, {0, 1, 0})
+    );
+}
 
 class Application {
 public:
@@ -113,11 +127,13 @@ public:
         camera.setAspectRatio((float) w / h);
     }
 
+    typedef decltype(generate_scene()) scene_type;
+
 private:
     sdl::window_unique_ptr window;
     sdl::gl::context_unique_ptr gl_context;
     Camera camera;
-    SimpleHouse scene;
+    scene_type scene = generate_scene();
     bool exit{false};
 };
 
@@ -159,7 +175,7 @@ sdl::gl::context_unique_ptr initGlContext(SDL_Window *window) {
     glEnable(GL_LIGHT0);
 
 
-    glm::vec4 light{.2, .2, .2, 1};
+    glm::vec4 light{.4, .4, .4, 1};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, value_ptr(light));
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
