@@ -5,8 +5,8 @@
 
 slanted_roof::slanted_roof(float _inside_width, float _inside_length, float _slope, float _thickness,
                            float _overhang, material _material, material _material_top)
-    : _inside_width(_inside_width), _inside_length(_inside_length), _slope(_slope), _thickness(_thickness),
-      _overhang(_overhang), _material(_material), _material_top(_material_top) {}
+    : slanted_roof(_inside_width, _inside_length, _slope, _thickness, _overhang, _material,
+                   _material_top, false, 0) {}
 
 void slanted_roof::draw() const {
     float roof_angle = std::atan(_slope);
@@ -27,19 +27,26 @@ void slanted_roof::draw() const {
 
     std::vector<glm::vec3> points{
         // roof underside
-        {roof_x,  roof_underside_top_y,    0}, // 0
-        {roof_x,  roof_underside_bottom_y, -roof_underside_bottom_z},
-        {-roof_x, roof_underside_bottom_y, -roof_underside_bottom_z},
-        {-roof_x, roof_underside_top_y,    0},
-        {-roof_x, roof_underside_bottom_y, roof_underside_bottom_z},
-        {roof_x,  roof_underside_bottom_y, roof_underside_bottom_z},
+        {_slice_right ? _inside_width / 2 + _inside_length / 2 / std::tan(_slice_angle)
+                      : roof_x, roof_underside_top_y,    0}, // 0
+        {_slice_right ? _inside_width / 2 + (_inside_length + overhang_width) / std::tan(_slice_angle)
+                      : roof_x, roof_underside_bottom_y, -roof_underside_bottom_z},
+        {-roof_x,               roof_underside_bottom_y, -roof_underside_bottom_z},
+        {-roof_x,               roof_underside_top_y,    0},
+        {-roof_x,               roof_underside_bottom_y, roof_underside_bottom_z},
+        {_slice_right ? _inside_width / 2 - overhang_width / std::tan(_slice_angle)
+                      : roof_x, roof_underside_bottom_y, roof_underside_bottom_z},
         // roof topside
-        {roof_x,  roof_top_top_y,          0}, //6
-        {roof_x,  roof_top_bottom_y,       -roof_top_bottom_z},
-        {-roof_x, roof_top_bottom_y,       -roof_top_bottom_z},
-        {-roof_x, roof_top_top_y,          0},
-        {-roof_x, roof_top_bottom_y,       roof_top_bottom_z},
-        {roof_x,  roof_top_bottom_y,       roof_top_bottom_z},
+        {_slice_right ? _inside_width / 2 + _inside_length / 2 / std::tan(_slice_angle)
+                      : roof_x, roof_top_top_y,          0}, //6
+        {_slice_right ? _inside_width / 2 +
+                        (_inside_length + overhang_width + roof_thickness_z) / std::tan(_slice_angle)
+                      : roof_x, roof_top_bottom_y,       -roof_top_bottom_z},
+        {-roof_x,               roof_top_bottom_y,       -roof_top_bottom_z},
+        {-roof_x,               roof_top_top_y,          0},
+        {-roof_x,               roof_top_bottom_y,       roof_top_bottom_z},
+        {_slice_right ? _inside_width / 2 - (overhang_width + roof_thickness_z) / std::tan(_slice_angle)
+                      : roof_x, roof_top_bottom_y,       roof_top_bottom_z},
     };
 
 
@@ -105,3 +112,22 @@ void slanted_roof::draw() const {
     _material.load();
     display_mesh(points, polygons, normals, normal_indices, std::vector{_material, _material_top}, material_indices);
 }
+
+slanted_roof::slanted_roof(
+    float _inside_width, float _inside_length, float _slope, float _thickness, float _overhang,
+    material _material) : slanted_roof(_inside_width, _inside_length, _slope, _thickness, _overhang, _material,
+                                       _material) {}
+
+slanted_roof::slanted_roof(float inside_width, float inside_length, float slope, float thickness, float overhang,
+                           material material, bool slice_right, float slice_angle) : slanted_roof(inside_width,
+                                                                                                  inside_length, slope,
+                                                                                                  thickness, overhang,
+                                                                                                  material,
+                                                                                                  material, slice_right,
+                                                                                                  slice_angle) {}
+
+slanted_roof::slanted_roof(float inside_width, float inside_length, float slope, float thickness, float overhang,
+                           material material_bottom, material material_top, bool slice_right, float slice_angle)
+    : _inside_width(inside_width), _inside_length(inside_length), _slope(slope), _thickness(thickness),
+      _overhang(overhang), _material(material_bottom), _material_top(material_top), _slice_right(slice_right),
+      _slice_angle(slice_angle) {}
