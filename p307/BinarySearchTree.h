@@ -61,7 +61,7 @@ public:
     // Remove copy constructors to prevent memory leaks.
     BinarySearchTree(const BinarySearchTree<T, GetKey> &) = delete;
     
-    BinarySearchTree<T, GetKey> &operator=(const BinarySearchTree<T, GetKey>) = delete;
+    BinarySearchTree<T, GetKey> &operator=(const BinarySearchTree<T, GetKey>&) = delete;
     
     ~BinarySearchTree()
     {
