@@ -1,9 +1,14 @@
 #pragma once
 
+#include <optional>
+#include "gl_util.h"
+#include "gl_util_texture.h"
 #include <glm/vec4.hpp>
 
 class material {
 public:
+    material();
+
     material(
         const glm::vec4 &color,
         const glm::vec4 &diffuse,
@@ -34,10 +39,17 @@ public:
 
     void setEmissions(const glm::vec4 &emissions);
 
+    const std::optional<gl::texture> &getTexture() const;
+
+    void setTexture(gl::texture &&texture);
+
+    void clearTexture();
+
 private:
     glm::vec4 color;
     glm::vec4 diffuse;
     glm::vec4 specular;
     float shininess = 0;
     glm::vec4 emissions;
+    std::optional<gl::texture> _texture;
 };

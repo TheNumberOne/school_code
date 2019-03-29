@@ -1,5 +1,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
+#define STB_IMAGE_IMPLEMENTATION
+
+#include "stb_image.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <iostream>
@@ -17,26 +20,16 @@
 #include "display_lists_cache.h"
 #include "hex_house.h"
 #include "read_tiff_texture.h"
+#include "obj_model.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <fstream>
 
 uint msPerFrame = 1000 / 60;
 
 sdl::gl::context_unique_ptr initGlContext(SDL_Window *window);
 
 auto generate_scene() {
-    return display_lists_cache(transform(draw_all(
-        multi_transform(
-            transform(
-                hex_house(),
-                glm::translate(glm::mat4(1), glm::vec3{0, 0, -20})
-            ),
-            glm::mat4(1),
-            glm::rotate(glm::mat4(1), glm::pi<float>() / 2, {0, 1, 0}),
-            glm::rotate(glm::mat4(1), glm::pi<float>(), {0, 1, 0}),
-            glm::rotate(glm::mat4(1), glm::pi<float>() * 3 / 2, {0, 1, 0})
-        )
-    ), glm::translate(glm::mat4(1), glm::vec3{0, 0, 22})));
 }
 
 
@@ -55,6 +48,9 @@ public:
         )
     ), gl_context(initGlContext(window.get())) {
         resize(850, 600);
+        std::ifstream in{"assets/house4.obj"};\
+        in >> model;
+        scene = generate_scene();
     }
 
     void drawScene() {
@@ -70,6 +66,7 @@ public:
 
         drawLightSource();
         scene.draw();
+//        model.draw();
 
 //        GLenum err;
 //        if ((err = glGetError()) != GL_NO_ERROR) {
@@ -82,10 +79,12 @@ public:
         SDL_SetRelativeMouseMode(SDL_TRUE);
         SDL_Event event;
         unsigned int lastTime = SDL_GetTicks();
+        unsigned int lastFrame = SDL_GetTicks();
         while (!exit) {
             unsigned int currentTime = SDL_GetTicks();
-            while (lastTime + msPerFrame > currentTime
-                   && sdl::waitEventTimeout(&event, lastTime + msPerFrame - currentTime)) {
+
+            while (lastFrame + msPerFrame > currentTime
+                   && sdl::waitEventTimeout(&event, lastFrame + msPerFrame - currentTime)) {
                 handleEvents(event);
                 currentTime = SDL_GetTicks();
             }
@@ -94,6 +93,7 @@ public:
             lastTime = currentTime;
             drawScene();
             sdl::gl::swap_window(window.get());
+            lastFrame = SDL_GetTicks();
         }
     }
 
@@ -146,32 +146,47 @@ public:
         camera.setAspectRatio((float) w / h);
     }
 
-    typedef decltype(generate_scene()) scene_type;
+    display_lists_cache generate_scene() {
+//        return display_lists_cache(model);
+        return display_lists_cache(transform(draw_all(
+            multi_transform(
+                transform(
+                    model,
+                    glm::translate(glm::mat4(1), glm::vec3{0, 0, -40})
+                ),
+                glm::mat4(1),
+                glm::rotate(glm::mat4(1), glm::pi<float>() / 2, {0, 1, 0}),
+                glm::rotate(glm::mat4(1), glm::pi<float>(), {0, 1, 0}),
+                glm::rotate(glm::mat4(1), glm::pi<float>() * 3 / 2, {0, 1, 0})
+            )
+        ), glm::translate(glm::mat4(1), glm::vec3{0, 0, 40})));
+    }
 
 private:
     sdl::window_unique_ptr window;
     sdl::gl::context_unique_ptr gl_context;
-    GLuint texture = read_tiff_texture("assets/TexturesCom_BrickPavement_1.5x1.5_512_albedo.tif");
     Camera camera;
-    scene_type scene = generate_scene();
+    obj_model model;
+    display_lists_cache scene;
     bool exit{false};
 };
 
 // Main routine.
 int main(int argc, char **argv) {
+    stbi_set_flip_vertically_on_load(true);
     sdl::initialize library(SDL_INIT_VIDEO);
     std::vector<std::tuple<SDL_GLattr, int>> attrs{
-//        {SDL_GL_CONTEXT_MAJOR_VERSION, 3},
-//        {SDL_GL_CONTEXT_MINOR_VERSION, 2},
-//        {SDL_GL_CONTEXT_PROFILE_MASK,  SDL_GL_CONTEXT_PROFILE_COMPATIBILITY},
-        {SDL_GL_MULTISAMPLEBUFFERS, 1},
-        {SDL_GL_MULTISAMPLESAMPLES, 16},
-        {SDL_GL_RED_SIZE,           8},
-        {SDL_GL_GREEN_SIZE,         8},
-        {SDL_GL_BLUE_SIZE,          8},
-        {SDL_GL_ALPHA_SIZE,         8},
-        {SDL_GL_DOUBLEBUFFER,       1},
-        {SDL_GL_CONTEXT_FLAGS,      SDL_GL_CONTEXT_DEBUG_FLAG}
+        {SDL_GL_CONTEXT_MAJOR_VERSION, 3},
+        {SDL_GL_CONTEXT_MINOR_VERSION, 0},
+        {SDL_GL_CONTEXT_PROFILE_MASK,  SDL_GL_CONTEXT_PROFILE_COMPATIBILITY},
+        {SDL_GL_MULTISAMPLEBUFFERS,    1},
+        {SDL_GL_MULTISAMPLESAMPLES,    16},
+        {SDL_GL_RED_SIZE,              8},
+        {SDL_GL_GREEN_SIZE,            8},
+        {SDL_GL_BLUE_SIZE,             8},
+        {SDL_GL_ALPHA_SIZE,            8},
+        {SDL_GL_DOUBLEBUFFER,          1},
+        {SDL_GL_CONTEXT_FLAGS,         SDL_GL_CONTEXT_DEBUG_FLAG}
     };
     for (auto[key, value] : attrs) {
         sdl::gl::set_attribute(key, value);
@@ -179,7 +194,6 @@ int main(int argc, char **argv) {
 
     Application app;
     app.gameLoop();
-
 
     return 0;
 }
@@ -202,6 +216,7 @@ sdl::gl::context_unique_ptr initGlContext(SDL_Window *window) {
     sdl::gl::set_swap_interval(1);
     glewExperimental = GL_TRUE;
     glewInit();
+//    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClearColor(1.0, 1.0, 1.0, 1.0);
 
     glEnable(GL_MULTISAMPLE);
@@ -216,8 +231,8 @@ sdl::gl::context_unique_ptr initGlContext(SDL_Window *window) {
     glDebugMessageCallback(MessageCallback, nullptr);
 
 
-    glm::vec4 light{.4, .4, .4, 1};
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, value_ptr(light));
+//    glm::vec4 light{.4, .4, .4, 1};
+//    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, value_ptr(light));
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);

@@ -1,10 +1,10 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "door.h"
-#include "gl_util.h"
 #include "sphere.h"
 #include "transformed_object.h"
 #include "draw_container.h"
+#include "display_mesh.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 

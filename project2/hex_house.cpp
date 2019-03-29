@@ -28,6 +28,9 @@ void hex_house::draw() const {
     float door_width = .9;
     float door_height = 1.95;
     float door_stopper_size = .01;
+    float window_width = 2;
+    float window_height = 1.5f;
+    float window_base_offset_y = 1;
 
     float inside_roof_height = roof_slope * length_parts[0] / 2 + inside_wall_height;
 
@@ -57,7 +60,9 @@ void hex_house::draw() const {
                     inside_wall_height, outside_wall_height, total_width + wall_thickness * 2, wall_thickness, {
                         // front door
                         {door_width, door_height, .25f * total_width, door_height / 2 + door_stopper_size},
-                        {3, 2.3, .4f * total_width, 1.16}
+                        {3, 2.3, .4f * total_width, 1.16},
+                        {window_width, window_height, 0, window_height / 2 + window_base_offset_y},
+                        {window_width, window_height, -.25f * total_width, window_height / 2 + window_base_offset_y}
                     }, material1
                 },
                 glm::rotate(glm::pi<float>(), glm::vec3{0, 1, 0})
@@ -82,7 +87,8 @@ void hex_house::draw() const {
             transform(
                 wall{
                     inside_wall_height, outside_wall_height, length_parts[1], wall_thickness, {
-                        {door_width, door_height, .25f * length_parts[1], door_height / 2 + door_stopper_size}
+                        {door_width, door_height, .25f * length_parts[1], door_height / 2 + door_stopper_size},
+                        {window_width, window_height, -.25f * length_parts[1], window_height / 2 + window_base_offset_y}
                     }, material2
                 },
                 glm::translate(glm::vec3{total_width / 2 - width_parts[1], 0, -length_parts[0] - length_parts[1] / 2}) *

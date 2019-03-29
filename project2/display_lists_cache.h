@@ -18,6 +18,12 @@ public:
         glEndList();
     }
 
+    display_lists_cache() = default;
+
+    display_lists_cache(display_lists_cache &&other) noexcept;
+
+    display_lists_cache &operator=(display_lists_cache &&other) noexcept;
+
     display_lists_cache(const display_lists_cache &) = delete;
 
     auto operator=(const display_lists_cache &) = delete;
@@ -31,7 +37,17 @@ public:
     }
 
 private:
-    GLuint list;
+    GLuint list = 0;
 };
+
+
+display_lists_cache::display_lists_cache(display_lists_cache &&other) noexcept {
+    std::swap(list, other.list);
+}
+
+display_lists_cache &display_lists_cache::operator=(display_lists_cache &&other) noexcept {
+    std::swap(list, other.list);
+    return *this;
+}
 
 

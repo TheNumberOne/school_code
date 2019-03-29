@@ -2,7 +2,7 @@
 
 #include <SDL_quit.h>
 #include <SDL.h>
-#include <bits/unique_ptr.h>
+#include <memory>
 
 namespace sdl {
     class initialize {
@@ -24,6 +24,8 @@ namespace sdl {
     void waitEvent(SDL_Event *event);
 
     bool waitEventTimeout(SDL_Event *event, int timeout);
+
+    bool pollEvent(SDL_Event *event);
 
     namespace gl {
         typedef std::unique_ptr<void, decltype(&SDL_GL_DeleteContext)> context_unique_ptr;

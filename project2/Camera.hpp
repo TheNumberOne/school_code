@@ -41,8 +41,7 @@ private:
     float _near = .5;
     float _far = 1000;
     float _fov = glm::pi<float>() / 4;
-    float _movementSpeed = 1.6;
-    float _rotationSpeed = 2 * glm::pi<float>() / 6;
+    float _movementSpeed = 5;
 };
 
 

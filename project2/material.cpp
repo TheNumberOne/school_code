@@ -57,5 +57,24 @@ void material::load() const {
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, glm::value_ptr(specular));
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, &shininess);
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, glm::value_ptr(emissions));
+    if (_texture) {
+        _texture.value().enable();
+    } else {
+        glDisable(GL_TEXTURE_2D);
+    }
 }
+
+const std::optional<gl::texture> &material::getTexture() const {
+    return _texture;
+}
+
+void material::setTexture(gl::texture &&texture) {
+    _texture = std::move(texture);
+}
+
+void material::clearTexture() {
+    _texture = {};
+}
+
+material::material() = default;
 

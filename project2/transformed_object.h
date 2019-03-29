@@ -1,8 +1,9 @@
 #pragma once
 
+#include <GL/glew.h>
+#include <GL/gl.h>
 #include <glm/detail/type_mat.hpp>
 #include <glm/detail/type_mat4x4.hpp>
-#include <SDL_opengl.h>
 #include <glm/gtc/type_ptr.hpp>
 
 template<typename T>

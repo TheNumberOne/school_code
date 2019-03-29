@@ -31,6 +31,10 @@ bool sdl::waitEventTimeout(SDL_Event *event, int timeout) {
     return SDL_WaitEventTimeout(event, timeout) != 0;
 }
 
+bool sdl::pollEvent(SDL_Event *event) {
+    return SDL_PollEvent(event) == SDL_TRUE;
+}
+
 void sdl::gl::set_swap_interval(int interval) {
     check_error(SDL_GL_SetSwapInterval(interval), -1);
 }

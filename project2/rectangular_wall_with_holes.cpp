@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "rectangular_wall_with_holes.h"
 #include "gl_util.h"
+#include "display_mesh.h"
 #include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -9,7 +10,7 @@ wall::wall(float inside_height, float outside_height, float width, float thickne
            const material &material) : _inside_height_left(inside_height), _inside_height_right(inside_height),
                                        _outside_height_left(outside_height), _outside_height_right(outside_height),
                                        _width(width),
-                                       _thickness(thickness), _holes(holes), _material(material) {
+                                       _thickness(thickness), _holes(holes), _material(std::move(material)) {
     std::sort(_holes.begin(), _holes.end(), [](const hole &a, const hole &b) {
         return a.x < b.x;
     });

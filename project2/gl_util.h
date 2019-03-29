@@ -1,10 +1,34 @@
 #pragma once
 
+#include <GL/glew.h>
+#include <GL/gl.h>
 #include <vector>
+#include <string>
+#include "material.hpp"
 
-void display_mesh(const std::vector<glm::vec3> &points, const std::vector<std::vector<size_t>> &shapes,
-                  const std::vector<glm::vec3> &normals, const std::vector<size_t> &normal_indices);
+namespace gl {
+    class buffer {
+    public:
+        buffer();
 
-void display_mesh(const std::vector<glm::vec3> &points, const std::vector<std::vector<size_t>> &shapes,
-                  const std::vector<glm::vec3> &normals, const std::vector<size_t> &normal_indices,
-                  const std::vector<material> &materials, const std::vector<size_t> &material_indices);
+        struct no_init {
+        };
+
+        buffer(no_init) {}
+
+        ~buffer();
+
+        buffer(const buffer &) = delete;
+
+        buffer &operator=(const buffer &) = delete;
+
+        buffer(buffer &&) noexcept;
+
+        buffer &operator=(buffer &&) noexcept;
+
+        GLuint name() { return i; }
+
+    private:
+        GLuint i = 0;
+    };
+}

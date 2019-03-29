@@ -2,6 +2,7 @@
 #include <glm/geometric.hpp>
 #include "slanted_roof.h"
 #include "gl_util.h"
+#include "display_mesh.h"
 
 slanted_roof::slanted_roof(float _inside_width, float _inside_length, float _slope, float _thickness,
                            float _overhang, material _material, material _material_top)
