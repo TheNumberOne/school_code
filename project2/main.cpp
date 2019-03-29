@@ -4,7 +4,6 @@
 
 #include "stb_image.h"
 #include <GL/glew.h>
-#include <GL/freeglut.h>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <vector>
@@ -18,8 +17,6 @@
 #include "light.hpp"
 #include "draw_container.h"
 #include "display_lists_cache.h"
-#include "hex_house.h"
-#include "read_tiff_texture.h"
 #include "obj_model.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
@@ -176,17 +173,17 @@ int main(int argc, char **argv) {
     stbi_set_flip_vertically_on_load(true);
     sdl::initialize library(SDL_INIT_VIDEO);
     std::vector<std::tuple<SDL_GLattr, int>> attrs{
-        {SDL_GL_CONTEXT_MAJOR_VERSION, 3},
-        {SDL_GL_CONTEXT_MINOR_VERSION, 0},
-        {SDL_GL_CONTEXT_PROFILE_MASK,  SDL_GL_CONTEXT_PROFILE_COMPATIBILITY},
-        {SDL_GL_MULTISAMPLEBUFFERS,    1},
-        {SDL_GL_MULTISAMPLESAMPLES,    16},
-        {SDL_GL_RED_SIZE,              8},
-        {SDL_GL_GREEN_SIZE,            8},
-        {SDL_GL_BLUE_SIZE,             8},
-        {SDL_GL_ALPHA_SIZE,            8},
-        {SDL_GL_DOUBLEBUFFER,          1},
-        {SDL_GL_CONTEXT_FLAGS,         SDL_GL_CONTEXT_DEBUG_FLAG}
+            {SDL_GL_CONTEXT_MAJOR_VERSION, 3},
+            {SDL_GL_CONTEXT_MINOR_VERSION, 0},
+            {SDL_GL_CONTEXT_PROFILE_MASK,  SDL_GL_CONTEXT_PROFILE_COMPATIBILITY},
+            {SDL_GL_MULTISAMPLEBUFFERS,    1},
+            {SDL_GL_MULTISAMPLESAMPLES,    8},
+            {SDL_GL_RED_SIZE,              8},
+            {SDL_GL_GREEN_SIZE,            8},
+            {SDL_GL_BLUE_SIZE,             8},
+            {SDL_GL_ALPHA_SIZE,            8},
+            {SDL_GL_DOUBLEBUFFER,          1},
+            {SDL_GL_CONTEXT_FLAGS,         SDL_GL_CONTEXT_DEBUG_FLAG}
     };
     for (auto[key, value] : attrs) {
         sdl::gl::set_attribute(key, value);
