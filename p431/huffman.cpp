@@ -1,6 +1,7 @@
 #include <sstream>
 #include <algorithm>
 #include <bits/unique_ptr.h>
+#include <memory>
 
 #include "./huffman.h"
 
@@ -130,12 +131,12 @@ unique_ptr_node make_unique_ptr_node(Node *ptr)
 
 string compressData(const string &data)
 {
-    auto frequencies = std::make_unique<int[]>(NUM_CHARS);
+    auto frequencies = std::unique_ptr<int[]>(new int[NUM_CHARS]);
     countFrequencies(data, frequencies.get());
     
     auto tree = make_unique_ptr_node(buildBinaryTree(frequencies.get()));
     
-    auto codewords = std::make_unique<string[]>(NUM_CHARS);
+    auto codewords = std::unique_ptr<string[]>(new string[NUM_CHARS]);
     getCodewords(tree.get(), codewords.get());
     
     std::stringstream ss;
