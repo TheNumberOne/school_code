@@ -22,7 +22,7 @@ public:
     bool has_bunnies();
 
 private:
-    uint year = 0;
+    unsigned int year = 0;
     std::shared_ptr<std::default_random_engine> _rng;
     random_bunny_generator _rbg;
     std::vector<bunny> _bunnies;
