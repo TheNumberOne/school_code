@@ -30,9 +30,9 @@ public:
     
     void color(const std::string &color);
     
-    uint age() const;
+    unsigned int age() const;
     
-    void age(uint age);
+    void age(unsigned int age);
     
     const std::string &name() const;
     
@@ -45,7 +45,7 @@ public:
 private:
     std::string _gender;
     std::string _color;
-    uint _age;
+    unsigned int _age;
     std::string _name;
     bool _radioactive_mutant_vampire_bunny;
 };
