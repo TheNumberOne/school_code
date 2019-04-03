@@ -26,12 +26,12 @@ void bunny::color(const std::string &color)
     _color = color;
 }
 
-uint bunny::age() const
+unsigned int bunny::age() const
 {
     return _age;
 }
 
-void bunny::age(uint age)
+void bunny::age(unsigned int age)
 {
     _age = age;
 }
