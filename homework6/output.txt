@@ -1,0 +1,26 @@
+Total current value of all trucks: $160032.44
+Total value in 5 years: $70984.72
+
+Trucks sorted by name:
+1968 Ford Ranchero RWD
+1976 Jeep CJ-7 4WD
+1986 Chevrolet Silverado C-10 4WD
+1997 GMC Sierra 1500 Ext Cab RB RWD
+2000 Toyota Tundra SR5 RWD
+2004 Kenworth T2000 rwd
+2007 Chevrolet Silverado 1500 LS 4WD
+2016 Dodge Ram 1500 Sport 4x4
+2018 Honda Ridgeline RTL-T AWD
+2019 Ford F-150 4WD
+
+Trucks sorted by mileage:
+2019 Ford F-150 4WD
+2018 Honda Ridgeline RTL-T AWD
+1968 Ford Ranchero RWD
+2016 Dodge Ram 1500 Sport 4x4
+1976 Jeep CJ-7 4WD
+1997 GMC Sierra 1500 Ext Cab RB RWD
+1986 Chevrolet Silverado C-10 4WD
+2000 Toyota Tundra SR5 RWD
+2007 Chevrolet Silverado 1500 LS 4WD
+2004 Kenworth T2000 rwd
