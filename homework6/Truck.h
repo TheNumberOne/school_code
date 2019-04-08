@@ -35,11 +35,14 @@ public:
     }
 
     std::ostream &serialize(std::ostream &) const override;
+    std::string getName() const;
+    void printTruck() const;
 
 private:
     std::string mAwd;
     double mTowingCapacity;
 };
+
 
 
 #endif //HOMEWORK4_TRUCK_H
