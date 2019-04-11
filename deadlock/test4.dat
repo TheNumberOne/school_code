@@ -1,0 +1,18 @@
+# number of processes
+5
+# number of resource types
+4
+# existence vector E
+6 3 4 2
+# allocation matrix C
+3 0 1 1
+0 1 0 0
+1 1 1 0
+1 1 0 1
+0 0 0 0
+# request matrix R
+1 1 0 0
+0 1 1 2
+3 1 0 0
+0 0 1 0
+2 1 1 0
