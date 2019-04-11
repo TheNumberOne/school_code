@@ -11,7 +11,7 @@ typedef vector<int> (*ordering_algorithm)(int start, const vector<int> &input);
 
 void print_alg(const std::string &name, ordering_algorithm alg, int start, const vector<int> &requests);
 void validate_ordering(int start, vector<int> requests, vector<int> ordering);
-int calc_distance(std::vector<int> ordering);
+int calc_distance(const std::vector<int> &ordering);
 
 vector<int> fcfs_ordering(int start, const vector<int> &input);
 vector<int> ssf_ordering(int start, const vector<int> &input);
@@ -72,7 +72,7 @@ void validate_ordering(int start, vector<int> requests, vector<int> ordering) {
     }
 }
 
-int calc_distance(std::vector<int> ordering) {
+int calc_distance(const std::vector<int> &ordering) {
     int distance = 0;
     for (int i = 0; i < ordering.size() - 1; i++) {
         distance += std::abs(ordering[i] - ordering[i + 1]);
