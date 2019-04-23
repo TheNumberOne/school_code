@@ -1,10 +1,6 @@
-from typing import Tuple
-
 import glm
 import numpy
 from OpenGL.GL import *
-
-from vec3d import Vec3d
 
 _edge_vertex_shader = """#version 330 core
 layout (location = 0) in vec3 pos;
@@ -27,11 +23,11 @@ void main()
 
 class Edge:
     def __init__(self, p1, p2):
-        self.p1 = p1
-        self.p2 = p2
+        self.p1 = p1.xyz
+        self.p2 = p2.xyz
 
     def data(self):
-        return self.p1 + self.p2
+        return [*self.p1, *self.p2]
 
 
 def compile_shader(source: str, shader_type: Constant):
@@ -83,14 +79,15 @@ class Scene:
             glBufferData(GL_ARRAY_BUFFER, numpy.array(self._edges, numpy.float32), GL_DYNAMIC_DRAW)
             self._vbo_current = True
 
+    def _uniform(self, name, value):
+        view_loc = glGetUniformLocation(self._program, name)
+        glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm.value_ptr(value))
+
     def draw(self, view, projection):
         Scene._generate_and_bind_program()
         self._update_and_bind_vbo()
-        view_loc = glGetUniformLocation(self._program, "view")
-        glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm.value_ptr(view))
-        projection_loc = glGetUniformLocation(self._program, "projection")
-        glUniformMatrix4fv(projection_loc, 1, GL_FALSE, glm.value_ptr(projection))
-
+        self._uniform("view", view)
+        self._uniform("projection", projection)
         glDrawArrays(GL_LINES, 0, self._num_edges * 2)
 
     def add_edge(self, edge: Edge):
