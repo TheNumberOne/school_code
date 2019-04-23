@@ -38,6 +38,19 @@ int cutRodMemoImpl(const int *p, int n, int *memos, int &callCount) {
     return q;
 }
 
+
+//int cutRodMemo(const int *p, int n, int &callcount) {
+//    int *r = new int[n + 1];
+//    // Flattening r.
+//    for (int i = 0; i <= n; i++) {
+//        r[n] = -1;
+//    }
+//    int q = cutRodMemoImpl(p, n, r, callcount);
+//    delete[] r;
+//    return q;
+//    //return cutRodMemoImpl(p, n, r, callcount);
+//}
+
 // Here is the signature for cutRodMemo.
 int cutRodMemo(const int *p, int n, int &callCount) {
     std::unique_ptr<int[]> memos{new int[n + 1]};
