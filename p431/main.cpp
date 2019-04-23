@@ -195,7 +195,7 @@ void modifyFile(const string &from, const string &to, const bool compress)
 {
     // Check if we're going to overwrite the destination file
     {
-        ifstream f(to);
+        ifstream f(to, ios_base::in | ios_base::binary);
         if (f.good()) {
             cout << endl;
             cout << "***** Error *****" << endl;
