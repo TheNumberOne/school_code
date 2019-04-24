@@ -105,125 +105,137 @@ Color Color::GREEN = Color(0, 1, 0);
 Color Color::BLUE = Color(0, 0, 1);
 Color Color::BROWN = Color(0.6, 0.3, 0);
 
-Circle* Circle::_instance = 0;
-Line* Line::_instance = 0;
+Circle *Circle::_instance = 0;
+Line *Line::_instance = 0;
 
 static const int WIDTH = 640;
 static const int HEIGHT = 480;
 
-GLFWwindow* window;
+GLFWwindow *window;
 float wratio;
 
 // Global graph variable
 Graph g;
 
-static void error_callback(int error, const char* description) {
-  fprintf(stderr, "Error: %s\n", description);
+static void error_callback(int error, const char *description)
+{
+    fprintf(stderr, "Error: %s\n", description);
 }
 
 static void key_callback(
-    GLFWwindow* window, int key, int scancode, int action, int mods) {
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
+    GLFWwindow *window, int key, int scancode, int action, int mods
+)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
 }
 
-Point win2obj(double xwin, double ywin) {
-  int width, height;
-  glfwGetFramebufferSize(window, &width, &height);
-
-  return Point(wratio*2*(xwin/(double)WIDTH)-wratio, 0-(2*(ywin/(double)HEIGHT)-1));
+Point win2obj(double xwin, double ywin)
+{
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    
+    return Point(wratio * 2 * (xwin / (double) WIDTH) - wratio, 0 - (2 * (ywin / (double) HEIGHT) - 1));
 }
 
 bool moving = false;
+
 void mouse_button_callback(
-    GLFWwindow* window, int button, int action, int mods) {
-  using namespace std;
-  if (action == GLFW_PRESS) {
-    double x, y;
-    glfwGetCursorPos(window, &x, &y);
-    Point p = win2obj(x, y);
-    if (mods & GLFW_MOD_CONTROL) {
-      g.mouseControlClick(p);
-    } else if (mods & GLFW_MOD_SHIFT) {
-      g.mouseShiftClick(p);
-    } else if (mods == 0) {
-      moving = true;
-      g.mouseDown(p);
+    GLFWwindow *window, int button, int action, int mods
+)
+{
+    using namespace std;
+    if (action == GLFW_PRESS) {
+        double x, y;
+        glfwGetCursorPos(window, &x, &y);
+        Point p = win2obj(x, y);
+        if (mods & GLFW_MOD_CONTROL) {
+            g.mouseControlClick(p);
+        } else if (mods & GLFW_MOD_SHIFT) {
+            g.mouseShiftClick(p);
+        } else if (mods == 0) {
+            moving = true;
+            g.mouseDown(p);
+        }
+    } else if (action == GLFW_RELEASE) {
+        moving = false;
     }
-  } else if (action == GLFW_RELEASE) {
-    moving = false;
-  }
 }
 
-void cursor_pos_callback(GLFWwindow* window, double x, double y) {
-  if (moving) {
-    Point p = win2obj(x, y);
-    g.mouseMoved(p);
-  }
+void cursor_pos_callback(GLFWwindow *window, double x, double y)
+{
+    if (moving) {
+        Point p = win2obj(x, y);
+        g.mouseMoved(p);
+    }
 }
 
-void render(FlatProgram& program) {
-  mat4x4 m, p, mvp;
-
-  glClearColor(1, 1, 1, 0);
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  mat4x4_identity(m);
-  mat4x4_ortho(p, -wratio, wratio, -1.f, 1.f, 1.f, -1.f);
-  mat4x4_mul(mvp, p, m);
-
-  glUseProgram(program.program);
-  glUniformMatrix4fv(program.mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
-
-  g.render(program, mvp);
+void render(FlatProgram &program)
+{
+    mat4x4 m, p, mvp;
+    
+    glClearColor(1, 1, 1, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    mat4x4_identity(m);
+    mat4x4_ortho(p, -wratio, wratio, -1.f, 1.f, 1.f, -1.f);
+    mat4x4_mul(mvp, p, m);
+    
+    glUseProgram(program.program);
+    glUniformMatrix4fv(program.mvp_location, 1, GL_FALSE, (const GLfloat *) mvp);
+    
+    g.render(program, mvp);
 }
 
-int main(void) {
-  using namespace std;
-
-  glfwSetErrorCallback(error_callback);
-
-  if (!glfwInit())
-    exit(EXIT_FAILURE);
-
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-  window = glfwCreateWindow(WIDTH, HEIGHT, "Dijkstra", NULL, NULL);
-  if (!window) {
+int main(void)
+{
+    using namespace std;
+    
+    glfwSetErrorCallback(error_callback);
+    
+    if (!glfwInit()) {
+        exit(EXIT_FAILURE);
+    }
+    
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Dijkstra", NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
+    
+    glfwMakeContextCurrent(window);
+    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+    glfwSwapInterval(1);
+    
+    Circle::instance();
+    Line::instance();
+    
+    FlatProgram program;
+    initGraph(g);
+    
+    while (!glfwWindowShouldClose(window)) {
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+        wratio = width / (float) height;
+        glViewport(0, 0, width, height);
+        
+        render(program);
+        
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+    
+    glfwDestroyWindow(window);
+    
     glfwTerminate();
-    exit(EXIT_FAILURE);
-  }
-
-  glfwSetKeyCallback(window, key_callback);
-  glfwSetMouseButtonCallback(window, mouse_button_callback);
-  glfwSetCursorPosCallback(window, cursor_pos_callback);
-
-  glfwMakeContextCurrent(window);
-  gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-  glfwSwapInterval(1);
-
-  Circle::instance();
-  Line::instance();
-
-  FlatProgram program;
-  initGraph(g);
-
-  while (!glfwWindowShouldClose(window)) {
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    wratio = width / (float) height;
-    glViewport(0, 0, width, height);
-
-    render(program);
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-  }
-
-  glfwDestroyWindow(window);
-
-  glfwTerminate();
-  exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
 
