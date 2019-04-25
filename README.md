@@ -1,0 +1,1 @@
+To install all dependencies, run `pipenv sync`.
