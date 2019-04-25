@@ -1,11 +1,11 @@
-from turtle import forward, left, main_loop
+from turtle import *
 
 
-forward(100)
 left(90)
-forward(50)
-left(45)
-forward(200)
+forward(1)
+right(90)
+down(45)
+forward(1)
 main_loop()
 
 
