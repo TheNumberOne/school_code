@@ -137,8 +137,10 @@ def main_loop():
                 keys = pygame.key.get_pressed()
                 forward = keys[pygame.K_w] - keys[pygame.K_s]
                 right = keys[pygame.K_d] - keys[pygame.K_a]
+                roll = keys[pygame.K_r] - keys[pygame.K_q]
                 camera.move(forward * Camera.move_speed)
                 camera.move_right(right * camera.move_speed)
+                camera.roll_clockwise(roll)
 
         camera.update(clock.tick(60))
         glClear(GL_COLOR_BUFFER_BIT)

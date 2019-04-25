@@ -50,10 +50,11 @@ class Camera:
     def move_right(self, rate):
         self.right_rate = rate
 
-    def roll(self, rate):
+    def roll_clockwise(self, rate):
         self.roll_rate = rate
 
     def update(self, ms):
         time = ms / 1000
         self.eye += self.forward * time * self.forward_rate
         self.eye += glm.cross(self.forward, self.up) * time * self.right_rate
+        self.up = (glm.rotate(glm.identity(glm.mat4), self.roll_rate * time, self.forward) * glm.vec4(self.up, 1)).xyz
