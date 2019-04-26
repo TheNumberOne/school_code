@@ -111,6 +111,8 @@ def main_loop():
     camera = Camera()
     clock = pygame.time.Clock()
 
+    print("OpenGL version %s" % glGetString(GL_VERSION).decode("ascii"))
+
     def cb_dbg_msg(source, msg_type, msg_id, severity, length, raw, user):
         msg = raw[0:length]
         print('debug', source, msg_type, msg_id, severity, msg)
