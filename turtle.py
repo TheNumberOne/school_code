@@ -111,6 +111,14 @@ def main_loop():
     camera = Camera()
     clock = pygame.time.Clock()
 
+    def cb_dbg_msg(source, msg_type, msg_id, severity, length, raw, user):
+        msg = raw[0:length]
+        print('debug', source, msg_type, msg_id, severity, msg)
+
+
+    # Install our debug message callback
+    glDebugMessageCallback(GLDEBUGPROC(cb_dbg_msg), None)
+
     glClearColor(1, 1, 1, 1)
     glEnable(GL_LINE_SMOOTH)
 
