@@ -106,7 +106,7 @@ def set_display_size(size: (int, int)):
 def main_loop():
     pygame.init()
     pygame.display.gl_set_attribute(GL_MULTISAMPLEBUFFERS, 1)
-    pygame.display.gl_set_attribute(GL_MULTISAMPLESAMPLES, 8)
+    pygame.display.gl_set_attribute(GL_MULTISAMPLESAMPLES, 4)
     pygame.display.set_caption("group project")
     camera = Camera()
     clock = pygame.time.Clock()
@@ -114,7 +114,6 @@ def main_loop():
     def cb_dbg_msg(source, msg_type, msg_id, severity, length, raw, user):
         msg = raw[0:length]
         print('debug', source, msg_type, msg_id, severity, msg)
-
 
     # Install our debug message callback
     glDebugMessageCallback(GLDEBUGPROC(cb_dbg_msg), None)
@@ -155,5 +154,5 @@ def main_loop():
 
         _t()._scene.draw(camera.view(), camera.projection())
 
-        pygame.time.wait(1000//60)
+        pygame.time.wait(1000 // 60)
         pygame.display.flip()
