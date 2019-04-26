@@ -2,7 +2,7 @@ import glm
 import numpy
 from OpenGL.GL import *
 
-_edge_vertex_shader = """#version 330 core
+_edge_vertex_shader = """#version 310 es
 layout (location = 0) in vec3 pos;
 uniform mat4 view;
 uniform mat4 projection;
@@ -12,8 +12,8 @@ void main()
 }
 """
 
-_edge_fragment_shader = """#version 330 core
-out vec4 FragColor;
+_edge_fragment_shader = """#version 310 es
+out lowp vec4 FragColor;
 void main()
 {
     FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
