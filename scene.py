@@ -1,32 +1,39 @@
 import glm
 import numpy
 from OpenGL.GL import *
+from OpenGL.arrays import vbo
 
 _edge_vertex_shader = """#version 100
 attribute vec3 pos;
+attribute vec3 in_color;
+varying lowp vec3 color;
 uniform mat4 view;
 uniform mat4 projection;
+
 void main()
 {
     gl_Position = projection * view * vec4(pos.x, pos.y, pos.z, 1.0);
+    color = in_color;
 }
 """
 
 _edge_fragment_shader = """#version 100
+varying lowp vec3 color;
 void main()
 {
-    gl_FragColor = vec4(1.0, 0.5, 0.2, 1.0);
+    gl_FragColor = vec4(color, 1.0);
 }
 """
 
 
 class Edge:
-    def __init__(self, p1, p2):
+    def __init__(self, p1, p2, color):
         self.p1 = p1.xyz
         self.p2 = p2.xyz
+        self.color = color.rgb
 
     def data(self):
-        return [*self.p1, *self.p2]
+        return [*self.p1, *self.color, *self.p2, *self.color]
 
 
 def compile_shader(source: str, shader_type: Constant):
@@ -68,14 +75,14 @@ class Scene:
         if self._vao is None:
             self._vao = glGenVertexArrays(1)
         glBindVertexArray(self._vao)
-        if self._vbo is None:
-            self._vbo = glGenBuffers(1)
-            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, None)
+        if self._vbo is None or not self._vbo_current:
+            self._vbo = vbo.VBO(numpy.array(self._edges, numpy.float32))
+            self._vbo.bind()
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 24, self._vbo)
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, self._vbo + 12)
             glEnableVertexAttribArray(0)
-        if not self._vbo_current:
-            glBindBuffer(GL_ARRAY_BUFFER, self._vbo)
-            glBufferData(GL_ARRAY_BUFFER, numpy.array(self._edges, numpy.float32), GL_DYNAMIC_DRAW)
+            glEnableVertexAttribArray(1)
+            self._vbo.unbind()
             self._vbo_current = True
 
     def _uniform(self, name, value):

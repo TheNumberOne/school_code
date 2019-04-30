@@ -17,10 +17,11 @@ class Turtle:
         self._up = glm.vec4(0, 0, 1, 1)
         self._forward = glm.vec4(1, 0, 0, 1)
         self._scene = Scene()
+        self._color = glm.vec4(0, 0, 0, 1)
 
     def forward(self, distance):
         new_pos = self._pos + self._forward * distance
-        self._scene.add_edge(Edge(self._pos, new_pos))
+        self._scene.add_edge(Edge(self._pos, new_pos, self._color))
         self._pos = new_pos
 
     def backward(self, distance):
@@ -59,6 +60,10 @@ class Turtle:
                 raise ValueError("Can't convert {} to a point" % x)
         self._pos.xyz = x, y, z
 
+    def color(self, x, y=None, z=None):
+        c = Color(x) if y is None else Color(x, y, z)
+        self._color = glm.vec3(c.r, c.g, c.b)
+
 
 _the_turtle = None
 
@@ -95,6 +100,9 @@ def down(angle): _t().down(angle)
 
 
 def goto(x, y=None, z=0): _t().goto(x, y, z)
+
+
+def color(x, y=None, z=None): _t().color(x, y, z)
 
 
 def set_display_size(size: (int, int)):
@@ -151,10 +159,9 @@ def main_loop():
                 camera.move_right(right * camera.move_speed)
                 camera.roll_clockwise(roll)
 
-        camera.update(clock.tick(60))
+        camera.update(clock.tick(30))
         glClear(GL_COLOR_BUFFER_BIT)
 
         _t()._scene.draw(camera.view(), camera.projection())
 
-        pygame.time.wait(1000 // 60)
         pygame.display.flip()
