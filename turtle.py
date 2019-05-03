@@ -6,6 +6,7 @@ from OpenGL.GL import *
 from pygame import *
 
 from camera import Camera
+from camera import _c
 from scene import Scene, Edge
 
 turtle_funcs = []
@@ -18,6 +19,7 @@ class Turtle:
         self._forward = glm.vec4(1, 0, 0, 1)
         self._scene = Scene()
         self._color = glm.vec4(0, 0, 0, 1)
+        self._background_color = (1, 1, 1, 1)
 
     def forward(self, distance):
         new_pos = self._pos + self._forward * distance
@@ -63,17 +65,20 @@ class Turtle:
     def color(self, x, y=None, z=None):
         c = Color(x) if y is None else Color(x, y, z)
         self._color = glm.vec3(c.r, c.g, c.b)
+        
+    def background_color(self):
+        return self._background_color
 
-
+    def set_background_color(self, color):
+        self._background_color = color
+    
 _the_turtle = None
-
 
 def _t():
     global _the_turtle
     if _the_turtle is None:
         _the_turtle = Turtle()
     return _the_turtle
-
 
 def forward(distance): _t().forward(distance)
 
@@ -104,6 +109,8 @@ def goto(x, y=None, z=0): _t().goto(x, y, z)
 
 def color(x, y=None, z=None): _t().color(x, y, z)
 
+def set_background_color(red, green, blue, alpha): _t().set_background_color((red, green, blue, alpha))
+
 
 def set_display_size(size: (int, int)):
     """Configures OpenGL and pygame to use a display with specified size."""
@@ -112,11 +119,11 @@ def set_display_size(size: (int, int)):
 
 
 def main_loop():
+    camera = _c()
     pygame.init()
     pygame.display.gl_set_attribute(GL_MULTISAMPLEBUFFERS, 1)
     pygame.display.gl_set_attribute(GL_MULTISAMPLESAMPLES, 4)
     pygame.display.set_caption("group project")
-    camera = Camera()
     clock = pygame.time.Clock()
 
     print("OpenGL version %s" % glGetString(GL_VERSION).decode("ascii"))
@@ -128,11 +135,12 @@ def main_loop():
     # Install our debug message callback
     glDebugMessageCallback(GLDEBUGPROC(cb_dbg_msg), None)
 
-    glClearColor(1, 1, 1, 1)
+    bColor = _t().background_color()
+    glClearColor(bColor[0], bColor[1], bColor[2], bColor[3])
     glEnable(GL_LINE_SMOOTH)
 
-    grabbed = False
-
+    grabbed = False   
+    
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

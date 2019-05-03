@@ -58,3 +58,28 @@ class Camera:
         self.eye += self.forward * time * self.forward_rate
         self.eye += glm.cross(self.forward, self.up) * time * self.right_rate
         self.up = (glm.rotate(glm.identity(glm.mat4), self.roll_rate * time, self.forward) * glm.vec4(self.up, 1)).xyz
+        
+    # User additional programmatic commands.
+    def set_camera_position(self, position):
+        self.eye = glm.vec3(position)
+        
+    def set_camera_facing(self, position):
+        newFacing = glm.normalize(glm.vec3(position - self.eye))
+        self.forward = newFacing
+        
+        
+ # Global camera for programmatic user control.       
+_the_camera = None
+
+def _c():
+    global _the_camera
+    if _the_camera is None:
+        _the_camera = Camera()
+    return _the_camera
+
+def set_display_size(display): _c().set_display_size(display)
+
+def look_from(x, y, z): _c().set_camera_position((x, y, z))
+
+def look_at(x, y, z): _c().set_camera_facing((x, y, z))   
+
