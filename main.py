@@ -3,7 +3,7 @@ from camera import *
 
 colors = [(1, 0, 0), "green", "blue"]
 for i in range(500):
-    color(colors[i // 100 % 3])
+    color(colors[i % 3])
     left(57.263)
     forward(1)
     up(52)

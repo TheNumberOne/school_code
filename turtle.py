@@ -19,6 +19,7 @@ class Turtle:
         self._scene = Scene()
         self._color = glm.vec4(0, 0, 0, 1)
         self._background_color = (1, 1, 1, 1)
+        self._speed = 1
 
     def forward(self, distance):
         new_pos = self._pos + self._forward * distance
@@ -76,6 +77,9 @@ class Turtle:
 
     def set_background_color(self, color):
         self._background_color = color
+
+    def _update(self, ms):
+        self._scene.update(self._speed * ms / 1000)
 
 
 _the_turtle = None
@@ -181,7 +185,7 @@ def main_loop():
 
         tick = clock.tick(30)
         camera.update(tick)
-        _t()._scene.update(tick)
+        _t()._update(tick)
         glClear(GL_COLOR_BUFFER_BIT)
         glClear(GL_DEPTH_BUFFER_BIT)
 

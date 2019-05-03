@@ -25,8 +25,21 @@ void main()
 }
 """
 
+FLOATS_PER_EDGE = 12
+FLOATS_PER_VERTEX = 6
+BYTES_PER_VERTEX = FLOATS_PER_VERTEX * sizeof(GLfloat)
+POSITION_INDEX = 0
+POSITION_BYTES_INDEX = POSITION_INDEX * sizeof(GLfloat)
+COLOR_INDEX = 3
+COLOR_BYTES_INDEX = COLOR_INDEX * sizeof(GLfloat)
+POSITION_SIZE = 3
+COLOR_SIZE = 3
+POSITION_SHADER_LOCATION = 0
+COLOR_SHADER_LOCATION = 1
+
 
 class Edge:
+
     def __init__(self, p1, p2, color):
         self.p1 = p1.xyz
         self.p2 = p2.xyz
@@ -34,6 +47,13 @@ class Edge:
 
     def data(self):
         return [*self.p1, *self.color, *self.p2, *self.color]
+
+    def len(self):
+        return glm.distance(self.p1, self.p2)
+
+    @staticmethod
+    def data_index(edge_num, vertex, data_index):
+        return edge_num * FLOATS_PER_EDGE + vertex * FLOATS_PER_VERTEX + data_index
 
 
 def compile_shader(source: str, shader_type: Constant):
@@ -68,19 +88,34 @@ class Scene:
         self._vao = None
         self._vbo = None
         self._edges = []
+        self._displayed_edges = []
         self._num_edges = 0
+        self._num_displayed_edges = 0
         self._vbo_current = False
-        self._num_edges_to_show = 0
 
     def _update_and_bind_vbo(self):
         if self._vao is None:
             self._vao = glGenVertexArrays(1)
         glBindVertexArray(self._vao)
         if self._vbo is None or not self._vbo_current:
-            self._vbo = vbo.VBO(numpy.array(self._edges, numpy.float32))
+            self._vbo = vbo.VBO(numpy.array(self._displayed_edges, numpy.float32))
             self._vbo.bind()
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 24, self._vbo)
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, self._vbo + 12)
+            glVertexAttribPointer(
+                POSITION_SHADER_LOCATION,
+                POSITION_SIZE,
+                GL_FLOAT,
+                GL_FALSE,
+                BYTES_PER_VERTEX,
+                self._vbo + POSITION_BYTES_INDEX
+            )
+            glVertexAttribPointer(
+                COLOR_SHADER_LOCATION,
+                COLOR_SIZE,
+                GL_FLOAT,
+                GL_FALSE,
+                BYTES_PER_VERTEX,
+                self._vbo + COLOR_BYTES_INDEX
+            )
             glEnableVertexAttribArray(0)
             glEnableVertexAttribArray(1)
             self._vbo.unbind()
@@ -95,13 +130,44 @@ class Scene:
         self._update_and_bind_vbo()
         self._uniform("view", view)
         self._uniform("projection", projection)
-        glDrawArrays(GL_LINES, 0, self._num_edges_to_show * 2)
+        glDrawArrays(GL_LINES, 0, self._num_displayed_edges * 2)
 
     def add_edge(self, edge: Edge):
-        self._edges += edge.data()
+        self._edges += [edge]
         self._num_edges += 1
         self._vbo_current = False
 
-    def update(self, ms):
-        if self._num_edges_to_show < self._num_edges:
-            self._num_edges_to_show += 1
+    def update(self, distance):
+        if self._num_displayed_edges > 0:
+            last_edge_index = self._num_displayed_edges - 1
+            data_index = Edge.data_index(last_edge_index, 1, POSITION_INDEX)
+            last_vertex = glm.vec3(*self._displayed_edges[data_index: data_index + POSITION_SIZE])
+            next_target = self._edges[last_edge_index].p2
+
+            distance_left = glm.distance(last_vertex, next_target)
+
+            if distance_left > distance:
+                frac = distance / distance_left
+                last_vertex = frac * next_target + (1 - frac) * last_vertex
+                self._displayed_edges[data_index: data_index + POSITION_SIZE] = [*last_vertex]
+                self._vbo_current = False
+                return
+            if distance_left > 0:
+                self._displayed_edges[data_index: data_index + POSITION_SIZE] = [*next_target]
+                self._vbo_current = False
+
+        if self._num_displayed_edges == self._num_edges:
+            return
+        self._vbo_current = False
+        while self._num_displayed_edges < self._num_edges:
+            next_edge = self._edges[self._num_displayed_edges]
+            self._displayed_edges += next_edge.data()
+            self._num_displayed_edges += 1
+            if next_edge.len() > distance:
+                frac = distance / next_edge.len()
+                data_index = Edge.data_index(self._num_displayed_edges - 1, 1, POSITION_INDEX)
+                last_vertex = frac * next_edge.p2 + (1 - frac) * next_edge.p1
+                self._displayed_edges[data_index: data_index + POSITION_SIZE] = [*last_vertex]
+                return
+            else:
+                distance -= next_edge.len()
