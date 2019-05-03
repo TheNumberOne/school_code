@@ -77,7 +77,7 @@ def _c():
         _the_camera = Camera()
     return _the_camera
 
-def set_display_size(display): _c().set_display_size(display)
+def set_display_size(width, height): _c().set_display_size((width, height))
 
 def look_from(x, y, z): _c().set_camera_position((x, y, z))
 
