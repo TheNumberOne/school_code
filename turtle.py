@@ -1,5 +1,3 @@
-from typing import Callable
-
 import glm
 import pygame
 from OpenGL.GL import *
@@ -9,6 +7,7 @@ from camera import Camera
 from camera import _c
 from scene import Scene, Edge
 
+_DEBUG = False
 turtle_funcs = []
 
 
@@ -139,18 +138,18 @@ def main_loop():
 
     print("OpenGL version %s" % glGetString(GL_VERSION).decode("ascii"))
 
-    def cb_dbg_msg(source, msg_type, msg_id, severity, length, raw, user):
-        msg = raw[0:length]
-        print('debug', source, msg_type, msg_id, severity, msg)
+    if _DEBUG:
+        def cb_dbg_msg(source, msg_type, msg_id, severity, length, raw, user):
+            msg = raw[0:length]
+            print('debug', source, msg_type, msg_id, severity, msg)
 
-    # Install our debug message callback
-    glDebugMessageCallback(GLDEBUGPROC(cb_dbg_msg), None)
+        # Install our debug message callback
+        glDebugMessageCallback(GLDEBUGPROC(cb_dbg_msg), None)
 
     b_color = _t().background_color()
     glClearColor(b_color[0], b_color[1], b_color[2], b_color[3])
     glEnable(GL_LINE_SMOOTH)
     glEnable(GL_DEPTH_TEST)
-    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
 
     grabbed = False
 
