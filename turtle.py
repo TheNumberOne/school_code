@@ -3,8 +3,8 @@ import pygame
 from OpenGL.GL import *
 from pygame import *
 
-from camera import Camera
 from camera import _c
+from camera import *
 from scene import Scene, Edge
 
 _DEBUG = False
@@ -23,7 +23,7 @@ class Turtle:
 
     def forward(self, distance):
         new_pos = self._pos + self._forward * distance
-        self._scene.add_edge(Edge(self._pos, new_pos, self._color))
+        self._scene.add_edge(Edge(self._pos, new_pos, self._color, self._speed))
         self._pos = new_pos
 
     def backward(self, distance):
@@ -79,7 +79,13 @@ class Turtle:
         self._background_color = color
 
     def _update(self, ms):
-        self._scene.update(self._speed * ms / 1000)
+        self._scene.update(ms / 1000)
+
+    def speed(self, speed):
+        if speed == 0:
+            self._speed = math.inf
+        else:
+            self._speed = speed
 
 
 _the_turtle = None
@@ -125,10 +131,7 @@ def color(x, y=None, z=None): _t().color(x, y, z)
 def set_background_color(red, green, blue, alpha): _t().set_background_color((red, green, blue, alpha))
 
 
-def set_display_size(size: (int, int)):
-    """Configures OpenGL and pygame to use a display with specified size."""
-    pygame.display.set_mode(size, HWSURFACE | DOUBLEBUF | OPENGL | RESIZABLE)
-    glViewport(0, 0, *size)
+def speed(s): _t().speed(s)
 
 
 def main_loop():

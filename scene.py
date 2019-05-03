@@ -40,16 +40,20 @@ COLOR_SHADER_LOCATION = 1
 
 class Edge:
 
-    def __init__(self, p1, p2, color):
+    def __init__(self, p1, p2, color, speed):
         self.p1 = p1.xyz
         self.p2 = p2.xyz
         self.color = color.rgb
+        self.speed = speed
 
     def data(self):
         return [*self.p1, *self.color, *self.p2, *self.color]
 
     def len(self):
         return glm.distance(self.p1, self.p2)
+
+    def time(self):
+        return self.len() / self.speed
 
     @staticmethod
     def data_index(edge_num, vertex, data_index):
@@ -137,24 +141,26 @@ class Scene:
         self._num_edges += 1
         self._vbo_current = False
 
-    def update(self, distance):
+    def update(self, time):
         if self._num_displayed_edges > 0:
             last_edge_index = self._num_displayed_edges - 1
             data_index = Edge.data_index(last_edge_index, 1, POSITION_INDEX)
             last_vertex = glm.vec3(*self._displayed_edges[data_index: data_index + POSITION_SIZE])
-            next_target = self._edges[last_edge_index].p2
+            last_edge = self._edges[last_edge_index]
+            next_target = last_edge.p2
 
-            distance_left = glm.distance(last_vertex, next_target)
+            time_left = glm.distance(last_vertex, next_target) / last_edge.speed
 
-            if distance_left > distance:
-                frac = distance / distance_left
+            if time_left > time:
+                frac = time / time_left
                 last_vertex = frac * next_target + (1 - frac) * last_vertex
                 self._displayed_edges[data_index: data_index + POSITION_SIZE] = [*last_vertex]
                 self._vbo_current = False
                 return
-            if distance_left > 0:
+            if time_left > 0:
                 self._displayed_edges[data_index: data_index + POSITION_SIZE] = [*next_target]
                 self._vbo_current = False
+                time -= time_left
 
         if self._num_displayed_edges == self._num_edges:
             return
@@ -163,11 +169,11 @@ class Scene:
             next_edge = self._edges[self._num_displayed_edges]
             self._displayed_edges += next_edge.data()
             self._num_displayed_edges += 1
-            if next_edge.len() > distance:
-                frac = distance / next_edge.len()
+            if next_edge.time() > time:
+                frac = time / next_edge.time()
                 data_index = Edge.data_index(self._num_displayed_edges - 1, 1, POSITION_INDEX)
                 last_vertex = frac * next_edge.p2 + (1 - frac) * next_edge.p1
                 self._displayed_edges[data_index: data_index + POSITION_SIZE] = [*last_vertex]
                 return
             else:
-                distance -= next_edge.len()
+                time -= next_edge.time()
