@@ -9,5 +9,5 @@ for i in range(500):
     up(52)
     forward(1)
 look_from(0, 5, 20)
-look_at(5, 5, 5)
+look_at(0, 0, 0)
 main_loop()
