@@ -179,7 +179,9 @@ def main_loop():
                 camera.move_right(right * camera.move_speed)
                 camera.roll_clockwise(roll)
 
-        camera.update(clock.tick(30))
+        tick = clock.tick(30)
+        camera.update(tick)
+        _t()._scene.update(tick)
         glClear(GL_COLOR_BUFFER_BIT)
         glClear(GL_DEPTH_BUFFER_BIT)
 

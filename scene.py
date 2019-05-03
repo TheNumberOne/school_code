@@ -70,6 +70,7 @@ class Scene:
         self._edges = []
         self._num_edges = 0
         self._vbo_current = False
+        self._num_edges_to_show = 0
 
     def _update_and_bind_vbo(self):
         if self._vao is None:
@@ -94,9 +95,13 @@ class Scene:
         self._update_and_bind_vbo()
         self._uniform("view", view)
         self._uniform("projection", projection)
-        glDrawArrays(GL_LINES, 0, self._num_edges * 2)
+        glDrawArrays(GL_LINES, 0, self._num_edges_to_show * 2)
 
     def add_edge(self, edge: Edge):
         self._edges += edge.data()
         self._num_edges += 1
         self._vbo_current = False
+
+    def update(self, ms):
+        if self._num_edges_to_show < self._num_edges:
+            self._num_edges_to_show += 1
