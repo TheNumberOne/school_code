@@ -63,22 +63,31 @@ class Turtle:
         self._pos.xyz = x, y, z
 
     def color(self, x, y=None, z=None):
-        c = Color(x) if y is None else Color(x, y, z)
+        try:
+            c = Color(x, y, z, 0)
+        except ValueError:
+            try:
+                c = Color(x)
+            except ValueError:
+                c = Color(*x)
         self._color = glm.vec3(c.r, c.g, c.b)
-        
+
     def background_color(self):
         return self._background_color
 
     def set_background_color(self, color):
         self._background_color = color
-    
+
+
 _the_turtle = None
+
 
 def _t():
     global _the_turtle
     if _the_turtle is None:
         _the_turtle = Turtle()
     return _the_turtle
+
 
 def forward(distance): _t().forward(distance)
 
@@ -109,6 +118,7 @@ def goto(x, y=None, z=0): _t().goto(x, y, z)
 
 def color(x, y=None, z=None): _t().color(x, y, z)
 
+
 def set_background_color(red, green, blue, alpha): _t().set_background_color((red, green, blue, alpha))
 
 
@@ -124,6 +134,7 @@ def main_loop():
     pygame.display.gl_set_attribute(GL_MULTISAMPLEBUFFERS, 1)
     pygame.display.gl_set_attribute(GL_MULTISAMPLESAMPLES, 4)
     pygame.display.set_caption("group project")
+    camera.open_window()
     clock = pygame.time.Clock()
 
     print("OpenGL version %s" % glGetString(GL_VERSION).decode("ascii"))
@@ -135,12 +146,14 @@ def main_loop():
     # Install our debug message callback
     glDebugMessageCallback(GLDEBUGPROC(cb_dbg_msg), None)
 
-    bColor = _t().background_color()
-    glClearColor(bColor[0], bColor[1], bColor[2], bColor[3])
+    b_color = _t().background_color()
+    glClearColor(b_color[0], b_color[1], b_color[2], b_color[3])
     glEnable(GL_LINE_SMOOTH)
+    glEnable(GL_DEPTH_TEST)
+    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
 
-    grabbed = False   
-    
+    grabbed = False
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -169,6 +182,7 @@ def main_loop():
 
         camera.update(clock.tick(30))
         glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_DEPTH_BUFFER_BIT)
 
         _t()._scene.draw(camera.view(), camera.projection())
 
