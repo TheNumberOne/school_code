@@ -1,0 +1,7 @@
+.idea/
+cmake-build-debug/
+cmake_install.cmake
+CMakeFiles/
+CMakeCache.txt
+CS2275_Project_2
+Makefile
